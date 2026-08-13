@@ -7,7 +7,8 @@
     "Radio Network Engineer"
   ],
   "experienceLevel": "mid",
-  "experienceYears": "2-5",
+  "experienceYears": "3-5",
+  "experienceStrict": true,
   "salaryMin": 110000,
   "currency": "AUD",
   "location": {

@@ -106,6 +106,31 @@ function extractSalary(text) {
   return null;
 }
 
+// Find a stated experience requirement in the ad text.
+// Returns { min, max } in years (max null for open-ended "5+ years") or null.
+function extractRequiredYears(text) {
+  if (!text) return null;
+  const t = text.toLowerCase();
+  // Scan every "N years" / "N-M years" mention, but only trust ones that talk
+  // about experience — not "25 years in business" or "5 year warranty".
+  const re = /(\d{1,2})(?:\s*(?:-|–|to)\s*(\d{1,2}))?\s*\+?\s*(?:years?|yrs?)([^.]{0,50})/g;
+  let m;
+  while ((m = re.exec(t)) !== null) {
+    const after = m[3] || "";
+    const before = t.slice(Math.max(0, m.index - 45), m.index);
+    const contextOk =
+      /experience|exp\b|in a similar|in the (?:role|field|industry)|working (?:in|with)/.test(after) ||
+      /experience|require|minimum|at least|demonstrated/.test(before);
+    if (!contextOk) continue;
+    const min = +m[1];
+    const max = m[2] ? +m[2] : /\+/.test(m[0]) || /minimum|at least|require/.test(t.slice(Math.max(0, m.index - 25), m.index)) ? null : +m[1];
+    if (min < 1 || min > 15) continue; // company-history blurbs, not requirements
+    if (max !== null && max < min) continue;
+    return { min, max };
+  }
+  return null;
+}
+
 // Human-readable salary for the widget, e.g. "$110k–$130k", "$85/hr", "$120k est."
 function formatSalary(j) {
   if (!j.salaryMin && !j.salaryMax) return null;
@@ -299,6 +324,11 @@ function scoreJob(job) {
   if (age <= 7) score += 10;
   else if (age <= 14) score += 5;
 
+  // A stated experience requirement squarely at the candidate's level is a
+  // strong signal the role is pitched right (out-of-band ones are excluded
+  // upstream before scoring).
+  if (job.requiredYears && job.requiredYears.min >= 2) score += 10;
+
   return score;
 }
 
@@ -366,7 +396,7 @@ async function rankWithClaude(candidates) {
             `Candidate profile:\n${JSON.stringify(
               {
                 targetRoles: prefs.roles,
-                experience: `${prefs.experienceYears} years (mid-level)`,
+                experience: `${prefs.experienceYears} years (mid-level, strict)`,
                 minimumSalary: `${prefs.salaryMin} ${prefs.currency}`,
                 location: `${prefs.location.city}, Australia (on-site/hybrid)`,
               },
@@ -375,8 +405,12 @@ async function rankWithClaude(candidates) {
             )}\n\nJob listings:\n${JSON.stringify(jobList, null, 2)}\n\n` +
             `Select the best matches (at most ${TOP_N}), scored 0-100 for fit with a one-line ` +
             "reason each. Prioritise radio/RF/telecommunications relevance, then salary fit, " +
-            "then seniority fit (mid-level: exclude graduate and executive roles). Omit jobs " +
-            "that are clearly irrelevant, clearly below the salary floor, or at the wrong level.",
+            "then experience fit. The experience band is strict: the candidate has " +
+            `${prefs.experienceYears} years, so exclude roles that state a requirement above ` +
+            "that band (e.g. 7+ years), roles pitched at principal/leadership level, and " +
+            "junior/graduate roles. A plain 'Senior' title is acceptable only if the ad " +
+            "suggests it suits someone with ~5 years. Omit jobs that are clearly irrelevant " +
+            "or clearly below the salary floor.",
         },
       ],
     });
@@ -422,6 +456,24 @@ for (const job of candidates) {
       job.salaryUnit = found.unit;
       job.salaryPredicted = false;
     }
+  }
+}
+
+// Strict experience gate: when an ad states a requirement, it must fit a
+// candidate with 3-5 years — exclude roles demanding more than the candidate
+// has, or capped below their level. Ads that don't state years pass through.
+const [candMin, candMax] = prefs.experienceYears.split("-").map(Number);
+for (const job of candidates) job.requiredYears = extractRequiredYears(job.description);
+if (prefs.experienceStrict) {
+  const before = candidates.length;
+  candidates = candidates.filter((j) => {
+    if (!j.requiredYears) return true;
+    if (j.requiredYears.min > candMax) return false; // e.g. "7+ years"
+    if (j.requiredYears.max !== null && j.requiredYears.max < candMin - 1) return false; // junior-capped
+    return true;
+  });
+  if (candidates.length < before) {
+    console.log(`Experience gate: excluded ${before - candidates.length} jobs outside ${prefs.experienceYears} years.`);
   }
 }
 
@@ -473,6 +525,11 @@ let output = {
     company: j.company,
     location: j.location,
     salary: formatSalary(j),
+    experience: j.requiredYears
+      ? j.requiredYears.max !== null && j.requiredYears.max !== j.requiredYears.min
+        ? `${j.requiredYears.min}-${j.requiredYears.max} yrs`
+        : `${j.requiredYears.min}${j.requiredYears.max === null ? "+" : ""} yrs`
+      : null,
     url: j.url,
     score: j.score,
     reason: j.reason,

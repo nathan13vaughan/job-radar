@@ -150,7 +150,9 @@ function addJobRow(widget, job, opts) {
   companyText.lineLimit = 1;
 
   if (opts.thirdLine) {
-    const extra = job.reason || [shortLocation(job.location), ageLabel(job.posted)].filter(Boolean).join("  ·  ");
+    const extra =
+      job.reason ||
+      [job.experience, shortLocation(job.location), ageLabel(job.posted)].filter(Boolean).join("  ·  ");
     if (extra) {
       left.addSpacer(1);
       const extraText = left.addText(extra);
@@ -261,7 +263,7 @@ function presentTable(data) {
   for (const job of data.jobs) {
     const row = new UITableRow();
     row.height = job.reason ? 84 : 64;
-    const subParts = [job.salary, job.company, shortLocation(job.location), ageLabel(job.posted)].filter(Boolean);
+    const subParts = [job.salary, job.experience, job.company, shortLocation(job.location), ageLabel(job.posted)].filter(Boolean);
     const sub = job.reason ? `${subParts.join("  ·  ")}\n${job.reason}` : subParts.join("  ·  ");
     const cell = row.addText(job.title, sub);
     cell.titleFont = Font.semiboldSystemFont(15);
