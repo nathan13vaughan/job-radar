@@ -1,7 +1,9 @@
 {
-  "updated": "2026-08-13T14:02:01.272Z",
+  "updated": "2026-08-13T14:18:23.418Z",
   "setupNeeded": false,
   "message": null,
+  "rankedBy": "keyword",
+  "criteria": "3-5 yrs · $110k+ · Melbourne",
   "jobs": [
     {
       "title": "Senior Telecommunications Engineer, Specialist - AUS Wide",
@@ -9,11 +11,35 @@
       "location": "Melbourne, Melbourne Region",
       "salary": null,
       "experience": null,
-      "url": "https://www.adzuna.com.au/land/ad/5831482406?se=vhjifh-X8RGhteErNNB1ww&utm_medium=api&utm_source=1bc3321f&v=2D6C57B1579CA05AB54E32C4B850D21265F50D23",
+      "url": "https://www.adzuna.com.au/land/ad/5831482406?se=kjd_0yGX8RG1g66AfQDv_A&utm_medium=api&utm_source=1bc3321f&v=2D6C57B1579CA05AB54E32C4B850D21265F50D23",
       "score": 52,
       "reason": null,
       "source": "Adzuna",
       "posted": "2026-08-07T13:00:09Z"
+    },
+    {
+      "title": "OT Engineer",
+      "company": "XPT Software Australia Pty Ltd",
+      "location": "Melbourne CBD, Melbourne",
+      "salary": null,
+      "experience": null,
+      "url": "https://www.adzuna.com.au/details/5821426330?utm_medium=api&utm_source=1bc3321f",
+      "score": 27,
+      "reason": null,
+      "source": "Adzuna",
+      "posted": "2026-07-31T04:19:39Z"
+    },
+    {
+      "title": "Senior Project Engineer (Building)",
+      "company": "CPB Contractors",
+      "location": "South Yarra, Stonnington Area",
+      "salary": null,
+      "experience": null,
+      "url": "https://www.adzuna.com.au/details/5838611350?utm_medium=api&utm_source=1bc3321f",
+      "score": 22,
+      "reason": null,
+      "source": "Adzuna",
+      "posted": "2026-08-13T02:27:25Z"
     },
     {
       "title": "Expression of Interest - Senior Electronics Engineer - RF",
@@ -26,6 +52,18 @@
       "reason": null,
       "source": "Adzuna",
       "posted": "2026-07-22T11:32:32Z"
+    },
+    {
+      "title": "Radiologist Body Imaging - Radiology - Kelsey-Seybold - Remote",
+      "company": "Optum",
+      "location": "Flexible / Remote",
+      "salary": null,
+      "experience": null,
+      "url": "https://www.themuse.com/jobs/optum/radiologist-body-imaging-radiology-kelseyseybold-remote",
+      "score": 17,
+      "reason": null,
+      "source": "The Muse",
+      "posted": "2025-09-06T18:36:29Z"
     }
   ]
 }
