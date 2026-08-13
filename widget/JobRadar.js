@@ -29,17 +29,30 @@ async function loadData() {
     req.headers = {
       Accept: "application/vnd.github.raw+json",
       "X-GitHub-Api-Version": "2022-11-28",
-      ...(TOKEN ? { Authorization: `Bearer ${TOKEN}` } : {}),
+      ...(TOKEN ? { Authorization: `Bearer ${TOKEN.trim()}` } : {}),
     };
     const data = await req.loadJSON();
-    if (!data || !Array.isArray(data.jobs)) throw new Error("Bad payload");
+    const status = req.response ? req.response.statusCode : 0;
+    if (status === 401) {
+      throw new Error("GitHub rejected the token — re-paste it into the TOKEN line");
+    }
+    if (status === 404) {
+      throw new Error(
+        TOKEN
+          ? "Token can't see the repo — it needs Contents: Read-only on job-radar"
+          : "TOKEN is empty — paste your GitHub token into the script",
+      );
+    }
+    if (!data || !Array.isArray(data.jobs)) {
+      throw new Error(`GitHub error ${status}: ${data?.message || "unexpected response"}`);
+    }
     fm.writeString(cachePath, JSON.stringify(data));
     return data;
   } catch (err) {
     if (fm.fileExists(cachePath)) {
       return JSON.parse(fm.readString(cachePath));
     }
-    return { updated: null, message: `Setup needed: ${err}`, jobs: [] };
+    return { updated: null, message: `⚠️ ${err.message || err}`, jobs: [] };
   }
 }
 
