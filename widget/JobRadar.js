@@ -211,9 +211,9 @@ function buildWidget(data) {
 
   const layouts = {
     small: { rows: 2, titleSize: 10.5, subSize: 9, badge: false, thirdLine: false, gap: 5 },
-    medium: { rows: 3, titleSize: 12, subSize: 10, badge: true, thirdLine: false, gap: 7 },
-    large: { rows: 5, titleSize: 12.5, subSize: 10.5, badge: true, thirdLine: true, gap: 8 },
-    extraLarge: { rows: 5, titleSize: 13.5, subSize: 11.5, badge: true, thirdLine: true, gap: 9 },
+    medium: { rows: 4, titleSize: 11.5, subSize: 9.5, badge: true, thirdLine: false, gap: 5 },
+    large: { rows: 6, titleSize: 12, subSize: 10, badge: true, thirdLine: true, gap: 6 },
+    extraLarge: { rows: 6, titleSize: 13, subSize: 11, badge: true, thirdLine: true, gap: 8 },
   };
   const opts = layouts[family] || layouts.medium;
 

@@ -123,40 +123,65 @@ async function fetchAdzuna() {
   }
 
   const jobs = [];
+  const baseParams = {
+    app_id: appId,
+    app_key: appKey,
+    where: prefs.location.city,
+    distance: String(prefs.location.maxDistanceKm),
+    max_days_old: "28",
+    sort_by: "date",
+  };
+
+  function collect(data) {
+    for (const r of data.results || []) {
+      jobs.push({
+        id: `adzuna-${r.id}`,
+        title: r.title?.replace(/<\/?[^>]+>/g, "") || "Untitled",
+        company: r.company?.display_name || "Unknown",
+        location: r.location?.display_name || prefs.location.city,
+        salaryMin: r.salary_min || null,
+        salaryMax: r.salary_max || null,
+        salaryPredicted: r.salary_is_predicted === "1",
+        description: stripHtml(r.description),
+        url: r.redirect_url,
+        posted: r.created,
+        source: "Adzuna",
+      });
+    }
+    return data.results?.length ?? 0;
+  }
+
+  // Targeted searches for each preferred role title.
   for (const role of prefs.roles) {
-    const params = new URLSearchParams({
-      app_id: appId,
-      app_key: appKey,
-      results_per_page: "30",
-      what: role,
-      where: prefs.location.city,
-      distance: String(prefs.location.maxDistanceKm),
-      max_days_old: "28",
-      sort_by: "date",
-    });
-    const url = `https://api.adzuna.com/v1/api/jobs/${prefs.location.country}/search/1?${params}`;
+    const params = new URLSearchParams({ ...baseParams, results_per_page: "30", what: role });
     try {
-      const data = await fetchJson(url);
-      for (const r of data.results || []) {
-        jobs.push({
-          id: `adzuna-${r.id}`,
-          title: r.title?.replace(/<\/?[^>]+>/g, "") || "Untitled",
-          company: r.company?.display_name || "Unknown",
-          location: r.location?.display_name || prefs.location.city,
-          salaryMin: r.salary_min || null,
-          salaryMax: r.salary_max || null,
-          salaryPredicted: r.salary_is_predicted === "1",
-          description: stripHtml(r.description),
-          url: r.redirect_url,
-          posted: r.created,
-          source: "Adzuna",
-        });
-      }
-      console.log(`Adzuna: "${role}" -> ${data.results?.length ?? 0} results`);
+      const n = collect(await fetchJson(`https://api.adzuna.com/v1/api/jobs/${prefs.location.country}/search/1?${params}`));
+      console.log(`Adzuna: "${role}" -> ${n} results`);
     } catch (err) {
       console.error(`Adzuna: query "${role}" failed: ${err.message}`);
     }
   }
+
+  // Broad sweep: any "engineer" listing that mentions one of the domain
+  // keywords anywhere — catches titles the targeted searches miss
+  // (e.g. "Field Services Engineer" on a radio network).
+  for (const page of [1, 2]) {
+    const params = new URLSearchParams({
+      ...baseParams,
+      results_per_page: "50",
+      what_and: "engineer",
+      what_or: prefs.titleKeywords.join(" "),
+    });
+    try {
+      const n = collect(await fetchJson(`https://api.adzuna.com/v1/api/jobs/${prefs.location.country}/search/${page}?${params}`));
+      console.log(`Adzuna: broad sweep page ${page} -> ${n} results`);
+      if (n < 50) break;
+    } catch (err) {
+      console.error(`Adzuna: broad sweep page ${page} failed: ${err.message}`);
+      break;
+    }
+  }
+
   return { jobs, available: true };
 }
 
