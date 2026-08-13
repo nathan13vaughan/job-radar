@@ -8,6 +8,7 @@
 //   1. Fill in TOKEN below with a fine-grained GitHub token (Contents: Read-only,
 //      scoped to only the job-radar repo). See the repo README for exact steps.
 //   2. Add a Scriptable widget to your home screen and pick this script.
+// The script keeps itself up to date from the repo after that.
 
 const GITHUB_USER = "nathan13vaughan";
 const REPO = "job-radar";
@@ -15,6 +16,23 @@ const BRANCH = "main";
 const TOKEN = ""; // <-- paste your fine-grained GitHub token here
 
 const API_URL = `https://api.github.com/repos/${GITHUB_USER}/${REPO}/contents/data/jobs.json?ref=${BRANCH}`;
+
+// ---------------------------------------------------------------------------
+// Theme
+// ---------------------------------------------------------------------------
+
+const ACCENT = Color.dynamic(new Color("#2563eb"), new Color("#60a5fa"));
+const SALARY = Color.dynamic(new Color("#15803d"), new Color("#4ade80"));
+const PRIMARY = Color.dynamic(new Color("#111827"), new Color("#f3f4f6"));
+const SECONDARY = Color.dynamic(new Color("#6b7280"), new Color("#9ca3af"));
+const BG_TOP = Color.dynamic(new Color("#ffffff"), new Color("#1c2030"));
+const BG_BOTTOM = Color.dynamic(new Color("#eef1f7"), new Color("#0f1118"));
+
+function badgeColor(score) {
+  if (score >= 80) return new Color("#16a34a");
+  if (score >= 60) return new Color("#d97706");
+  return new Color("#64748b");
+}
 
 // ---------------------------------------------------------------------------
 // Data loading (network with on-disk fallback so the widget works offline)
@@ -58,93 +76,158 @@ async function loadData() {
 
 function updatedLabel(iso) {
   if (!iso) return "";
-  const d = new Date(iso);
   const df = new DateFormatter();
   df.dateFormat = "EEE h:mma";
-  return df.string(d);
+  return df.string(new Date(iso));
+}
+
+function ageLabel(posted) {
+  if (!posted) return null;
+  const days = Math.floor((Date.now() - new Date(posted).getTime()) / 86400000);
+  if (days <= 0) return "today";
+  if (days === 1) return "1d ago";
+  return `${days}d ago`;
+}
+
+function shortLocation(location) {
+  return (location || "").split(",")[0].trim();
 }
 
 // ---------------------------------------------------------------------------
 // Widget rendering
 // ---------------------------------------------------------------------------
 
-const ACCENT = new Color("#2f81f7");
-const PRIMARY = Color.dynamic(new Color("#1c1c1e"), new Color("#ffffff"));
-const SECONDARY = Color.dynamic(new Color("#6e6e73"), new Color("#98989d"));
+function addHeader(widget, data, family) {
+  const small = family === "small";
+  const header = widget.addStack();
+  header.centerAlignContent();
+
+  const sym = SFSymbol.named("dot.radiowaves.left.and.right");
+  sym.applyFont(Font.boldSystemFont(small ? 11 : 13));
+  const icon = header.addImage(sym.image);
+  icon.tintColor = ACCENT;
+  icon.imageSize = new Size(small ? 12 : 15, small ? 12 : 15);
+  header.addSpacer(4);
+
+  const title = header.addText("JOB RADAR");
+  title.font = Font.heavySystemFont(small ? 10 : 11);
+  title.textColor = ACCENT;
+
+  header.addSpacer();
+  const stamp = header.addText(updatedLabel(data.updated));
+  stamp.font = Font.mediumSystemFont(8);
+  stamp.textColor = SECONDARY;
+}
 
 function addJobRow(widget, job, opts) {
   const row = widget.addStack();
-  row.layoutVertically();
+  row.centerAlignContent();
   if (job.url) row.url = job.url;
 
-  const titleText = row.addText(job.title);
+  const left = row.addStack();
+  left.layoutVertically();
+
+  const titleText = left.addText(job.title);
   titleText.font = Font.semiboldSystemFont(opts.titleSize);
   titleText.textColor = PRIMARY;
   titleText.lineLimit = 1;
 
-  const subParts = [job.company];
-  if (job.salary) subParts.push(job.salary);
-  const subText = row.addText(subParts.join("  ·  "));
-  subText.font = Font.systemFont(opts.subSize);
-  subText.textColor = SECONDARY;
-  subText.lineLimit = 1;
-
-  if (opts.showReason && job.reason) {
-    const reasonText = row.addText(job.reason);
-    reasonText.font = Font.systemFont(opts.subSize - 1);
-    reasonText.textColor = ACCENT;
-    reasonText.lineLimit = 1;
+  left.addSpacer(1);
+  const sub = left.addStack();
+  sub.centerAlignContent();
+  if (job.salary) {
+    const salaryText = sub.addText(job.salary);
+    salaryText.font = Font.semiboldSystemFont(opts.subSize);
+    salaryText.textColor = SALARY;
+    salaryText.lineLimit = 1;
+    const dot = sub.addText("  ·  ");
+    dot.font = Font.systemFont(opts.subSize);
+    dot.textColor = SECONDARY;
   }
+  const companyText = sub.addText(job.company);
+  companyText.font = Font.systemFont(opts.subSize);
+  companyText.textColor = SECONDARY;
+  companyText.lineLimit = 1;
+
+  if (opts.thirdLine) {
+    const extra = job.reason || [shortLocation(job.location), ageLabel(job.posted)].filter(Boolean).join("  ·  ");
+    if (extra) {
+      left.addSpacer(1);
+      const extraText = left.addText(extra);
+      extraText.font = job.reason ? Font.italicSystemFont(opts.subSize - 1) : Font.systemFont(opts.subSize - 1);
+      extraText.textColor = job.reason ? ACCENT : SECONDARY;
+      extraText.lineLimit = 1;
+    }
+  }
+
+  row.addSpacer();
+
+  if (opts.badge && job.score != null) {
+    const badge = row.addStack();
+    badge.backgroundColor = badgeColor(job.score);
+    badge.cornerRadius = 7;
+    badge.setPadding(2, 6, 2, 6);
+    const badgeText = badge.addText(String(job.score));
+    badgeText.font = Font.boldSystemFont(10);
+    badgeText.textColor = Color.white();
+  }
+}
+
+function addEmptyState(widget, message) {
+  widget.addSpacer();
+  const stack = widget.addStack();
+  stack.addSpacer();
+  const inner = stack.addStack();
+  inner.layoutVertically();
+  inner.centerAlignContent();
+  const msg = inner.addText(message);
+  msg.font = Font.mediumSystemFont(11);
+  msg.textColor = SECONDARY;
+  msg.centerAlignText();
+  msg.lineLimit = 3;
+  stack.addSpacer();
+  widget.addSpacer();
 }
 
 function buildWidget(data) {
   const widget = new ListWidget();
   widget.refreshAfterDate = new Date(Date.now() + 4 * 60 * 60 * 1000);
-  widget.setPadding(14, 14, 12, 14);
+
+  const gradient = new LinearGradient();
+  gradient.colors = [BG_TOP, BG_BOTTOM];
+  gradient.locations = [0, 1];
+  widget.backgroundGradient = gradient;
 
   const family = config.widgetFamily || "medium";
+  widget.setPadding(12, 14, 10, 14);
 
-  // Header
-  const header = widget.addStack();
-  header.centerAlignContent();
-  const icon = header.addText("📡 ");
-  icon.font = Font.systemFont(family === "small" ? 11 : 13);
-  const title = header.addText("Job Radar");
-  title.font = Font.boldSystemFont(family === "small" ? 11 : 13);
-  title.textColor = ACCENT;
-  header.addSpacer();
-  const stamp = header.addText(updatedLabel(data.updated));
-  stamp.font = Font.systemFont(9);
-  stamp.textColor = SECONDARY;
-  widget.addSpacer(6);
+  addHeader(widget, data, family);
+  widget.addSpacer(family === "small" ? 5 : 8);
 
-  if (data.message && data.jobs.length === 0) {
-    const msg = widget.addText(data.message);
-    msg.font = Font.systemFont(12);
-    msg.textColor = SECONDARY;
-    widget.addSpacer();
+  if (data.jobs.length === 0) {
+    addEmptyState(widget, data.message || "No matching jobs today");
     return widget;
   }
 
   const layouts = {
-    small: { rows: 2, titleSize: 11, subSize: 9, showReason: false },
-    medium: { rows: 3, titleSize: 13, subSize: 11, showReason: false },
-    large: { rows: 6, titleSize: 13, subSize: 11, showReason: true },
-    extraLarge: { rows: 6, titleSize: 14, subSize: 12, showReason: true },
+    small: { rows: 2, titleSize: 10.5, subSize: 9, badge: false, thirdLine: false, gap: 5 },
+    medium: { rows: 3, titleSize: 12, subSize: 10, badge: true, thirdLine: false, gap: 7 },
+    large: { rows: 5, titleSize: 12.5, subSize: 10.5, badge: true, thirdLine: true, gap: 8 },
+    extraLarge: { rows: 5, titleSize: 13.5, subSize: 11.5, badge: true, thirdLine: true, gap: 9 },
   };
   const opts = layouts[family] || layouts.medium;
 
   const jobs = data.jobs.slice(0, opts.rows);
   for (let i = 0; i < jobs.length; i++) {
     addJobRow(widget, jobs[i], opts);
-    if (i < jobs.length - 1) widget.addSpacer(family === "small" ? 4 : 7);
+    if (i < jobs.length - 1) widget.addSpacer(opts.gap);
   }
   if (family === "small" && jobs[0]?.url) widget.url = jobs[0].url;
 
   widget.addSpacer();
   if (data.message) {
     const note = widget.addText(data.message);
-    note.font = Font.italicSystemFont(9);
+    note.font = Font.italicSystemFont(8.5);
     note.textColor = SECONDARY;
     note.lineLimit = 1;
   }
@@ -161,7 +244,12 @@ function presentTable(data) {
 
   const headerRow = new UITableRow();
   headerRow.isHeader = true;
-  headerRow.addText("📡 Job Radar", data.updated ? `Updated ${updatedLabel(data.updated)}` : "");
+  headerRow.addText(
+    "📡 Job Radar",
+    [data.jobs.length ? `${data.jobs.length} matches` : null, data.updated ? `updated ${updatedLabel(data.updated)}` : null]
+      .filter(Boolean)
+      .join(" · "),
+  );
   table.addRow(headerRow);
 
   if (data.message) {
@@ -172,8 +260,9 @@ function presentTable(data) {
 
   for (const job of data.jobs) {
     const row = new UITableRow();
-    row.height = job.reason ? 80 : 60;
-    const sub = [job.company, job.salary, job.reason].filter(Boolean).join("  ·  ");
+    row.height = job.reason ? 84 : 64;
+    const subParts = [job.salary, job.company, shortLocation(job.location), ageLabel(job.posted)].filter(Boolean);
+    const sub = job.reason ? `${subParts.join("  ·  ")}\n${job.reason}` : subParts.join("  ·  ");
     const cell = row.addText(job.title, sub);
     cell.titleFont = Font.semiboldSystemFont(15);
     cell.subtitleFont = Font.systemFont(12);
@@ -181,6 +270,8 @@ function presentTable(data) {
     if (job.score != null) {
       const scoreCell = row.addText(String(job.score));
       scoreCell.rightAligned();
+      scoreCell.titleFont = Font.boldSystemFont(15);
+      scoreCell.titleColor = badgeColor(job.score);
       scoreCell.widthWeight = 12;
       cell.widthWeight = 88;
     }

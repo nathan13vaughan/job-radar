@@ -40,6 +40,76 @@ function stripHtml(html) {
     .trim();
 }
 
+// Pull a salary out of the ad text when the API doesn't provide one.
+// Returns { min, max, unit: "year" | "hour" | "day" } or null.
+function extractSalary(text) {
+  if (!text) return null;
+  const t = text.replace(/,/g, "");
+  let m;
+
+  // Hourly: "$65 - $75 per hour", "$70/hr"
+  m = t.match(/\$(\d{2,3})(?:\.\d{2})?\s*(?:-|–|to)\s*\$?(\d{2,3})(?:\.\d{2})?\s*(?:per hour|an hour|\/\s?hr|p\.?\s?h\b)/i) ||
+      t.match(/\$(\d{2,3})(?:\.\d{2})?\s*(?:per hour|an hour|\/\s?hr|p\.?\s?h\b)/i);
+  if (m) {
+    const min = +m[1];
+    const max = m[2] ? +m[2] : min;
+    if (min >= 20 && max <= 250 && min <= max) return { min, max, unit: "hour" };
+  }
+
+  // Daily: "$800 - $950 per day", "$900/day"
+  m = t.match(/\$(\d{3,4})\s*(?:-|–|to)\s*\$?(\d{3,4})\s*(?:per day|a day|\/\s?day|daily)/i) ||
+      t.match(/\$(\d{3,4})\s*(?:per day|a day|\/\s?day|daily)/i);
+  if (m) {
+    const min = +m[1];
+    const max = m[2] ? +m[2] : min;
+    if (min >= 300 && max <= 3000 && min <= max) return { min, max, unit: "day" };
+  }
+
+  // Annual range: "$120k - $140k" or "$120000 - $140000"
+  m = t.match(/\$?(\d{2,3})k\s*(?:-|–|to)\s*\$?(\d{2,3})k/i);
+  if (m) {
+    const min = +m[1] * 1000;
+    const max = +m[2] * 1000;
+    if (min >= 40000 && max <= 400000 && min <= max) return { min, max, unit: "year" };
+  }
+  m = t.match(/\$(\d{5,6})\s*(?:-|–|to)\s*\$?(\d{5,6})/);
+  if (m) {
+    const min = +m[1];
+    const max = +m[2];
+    if (min >= 40000 && max <= 400000 && min <= max) return { min, max, unit: "year" };
+  }
+
+  // Single figure — only with clear salary context, to avoid picking up
+  // project budgets or contract values.
+  m = t.match(/(?:salary|package|remuneration|circa|up to|earn)\D{0,12}\$(\d{5,6})/i) ||
+      t.match(/\$(\d{5,6})\s*(?:per annum|pa\b|p\.a\.|a year|annually|\+\s?super)/i);
+  if (m) {
+    const v = +m[1];
+    if (v >= 40000 && v <= 400000) return { min: v, max: v, unit: "year" };
+  }
+  m = t.match(/\$(\d{2,3})k\b/i);
+  if (m) {
+    const v = +m[1] * 1000;
+    if (v >= 60000 && v <= 400000) return { min: v, max: v, unit: "year" };
+  }
+
+  return null;
+}
+
+// Human-readable salary for the widget, e.g. "$110k–$130k", "$85/hr", "$120k est."
+function formatSalary(j) {
+  if (!j.salaryMin && !j.salaryMax) return null;
+  const lo = j.salaryMin || j.salaryMax;
+  const hi = j.salaryMax || j.salaryMin;
+  if (j.salaryUnit === "hour" || j.salaryUnit === "day") {
+    const suffix = j.salaryUnit === "hour" ? "/hr" : "/day";
+    return lo === hi ? `$${lo}${suffix}` : `$${lo}–$${hi}${suffix}`;
+  }
+  const fmt = (v) => `$${Math.round(v / 1000)}k`;
+  const range = fmt(lo) === fmt(hi) ? fmt(lo) : `${fmt(lo)}–${fmt(hi)}`;
+  return j.salaryPredicted ? `${range} est.` : range;
+}
+
 // ---------------------------------------------------------------------------
 // Sources
 // ---------------------------------------------------------------------------
@@ -164,10 +234,12 @@ function scoreJob(job) {
   }
   score += Math.min(descHits * 3, 21);
 
-  // Salary fit.
-  if (job.salaryMax && job.salaryMax < prefs.salaryMin * 0.85) score -= 40;
-  if (job.salaryMin && job.salaryMin >= prefs.salaryMin) score += 15;
-  else if (job.salaryMax && job.salaryMax >= prefs.salaryMin) score += 8;
+  // Salary fit (annual figures only — hourly/daily rates aren't comparable).
+  if (job.salaryUnit === "year") {
+    if (job.salaryMax && job.salaryMax < prefs.salaryMin * 0.85) score -= 40;
+    if (job.salaryMin && job.salaryMin >= prefs.salaryMin) score += 15;
+    else if (job.salaryMax && job.salaryMax >= prefs.salaryMin) score += 8;
+  }
 
   // Recency.
   const age = daysOld(job);
@@ -285,6 +357,21 @@ const [adzuna, museJobs] = await Promise.all([fetchAdzuna(), fetchTheMuse()]);
 
 let candidates = dedupe([...adzuna.jobs, ...museJobs]).filter((j) => !isExcluded(j) && j.url);
 
+// Fill in salary: API-provided figures are annual; otherwise mine the ad text.
+for (const job of candidates) {
+  if (job.salaryMin || job.salaryMax) {
+    job.salaryUnit = "year";
+  } else {
+    const found = extractSalary(job.description);
+    if (found) {
+      job.salaryMin = found.min;
+      job.salaryMax = found.max;
+      job.salaryUnit = found.unit;
+      job.salaryPredicted = false;
+    }
+  }
+}
+
 for (const job of candidates) job.score = scoreJob(job);
 candidates = candidates
   .filter((j) => j.score >= 15) // must show some real relevance
@@ -317,10 +404,7 @@ const output = {
     title: j.title,
     company: j.company,
     location: j.location,
-    salary:
-      j.salaryMin || j.salaryMax
-        ? `$${Math.round((j.salaryMin || j.salaryMax) / 1000)}k–$${Math.round((j.salaryMax || j.salaryMin) / 1000)}k${j.salaryPredicted ? " est." : ""}`
-        : null,
+    salary: formatSalary(j),
     url: j.url,
     score: j.score,
     reason: j.reason,
