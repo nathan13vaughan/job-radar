@@ -21,13 +21,23 @@ const TOP_N = 10;
 // Fetch helpers
 // ---------------------------------------------------------------------------
 
-async function fetchJson(url, options = {}) {
-  const res = await fetch(url, {
-    headers: { "User-Agent": "job-radar (github.com job widget)" },
-    ...options,
-  });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText} for ${url}`);
-  return res.json();
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function fetchJson(url, { retries = 2 } = {}) {
+  for (let attempt = 0; ; attempt++) {
+    const res = await fetch(url, {
+      headers: { "User-Agent": "job-radar (github.com job widget)" },
+    });
+    if (res.ok) return res.json();
+    const retryable = res.status === 429 || res.status >= 500;
+    if (retryable && attempt < retries) {
+      const delay = 8000 * (attempt + 1);
+      console.log(`  ${res.status} — retrying in ${delay / 1000}s...`);
+      await sleep(delay);
+      continue;
+    }
+    throw new Error(`${res.status} ${res.statusText} for ${url}`);
+  }
 }
 
 function stripHtml(html) {
@@ -151,15 +161,21 @@ async function fetchAdzuna() {
     return data.results?.length ?? 0;
   }
 
+  let successes = 0;
+  let failures = 0;
+
   // Targeted searches for each preferred role title.
   for (const role of prefs.roles) {
     const params = new URLSearchParams({ ...baseParams, results_per_page: "30", what: role });
     try {
       const n = collect(await fetchJson(`https://api.adzuna.com/v1/api/jobs/${prefs.location.country}/search/1?${params}`));
       console.log(`Adzuna: "${role}" -> ${n} results`);
+      successes++;
     } catch (err) {
       console.error(`Adzuna: query "${role}" failed: ${err.message}`);
+      failures++;
     }
+    await sleep(400); // stay well inside the free-tier rate limit
   }
 
   // Broad sweep: any "engineer" listing that mentions one of the domain
@@ -175,14 +191,17 @@ async function fetchAdzuna() {
     try {
       const n = collect(await fetchJson(`https://api.adzuna.com/v1/api/jobs/${prefs.location.country}/search/${page}?${params}`));
       console.log(`Adzuna: broad sweep page ${page} -> ${n} results`);
+      successes++;
       if (n < 50) break;
     } catch (err) {
       console.error(`Adzuna: broad sweep page ${page} failed: ${err.message}`);
+      failures++;
       break;
     }
+    await sleep(400);
   }
 
-  return { jobs, available: true };
+  return { jobs, available: true, successes, failures };
 }
 
 async function fetchTheMuse() {
@@ -436,7 +455,7 @@ if (!adzuna.available) {
   message = "No matching jobs found today — check back tomorrow";
 }
 
-const output = {
+let output = {
   updated: new Date().toISOString(),
   setupNeeded: !adzuna.available,
   message,
@@ -452,6 +471,22 @@ const output = {
     posted: j.posted,
   })),
 };
+
+// If the fetch degraded (Adzuna configured but every query failed) and we'd be
+// publishing an empty list, keep the previous results rather than blanking the
+// widget over a transient outage.
+if (output.jobs.length === 0 && adzuna.available && adzuna.successes === 0 && adzuna.failures > 0) {
+  try {
+    const previous = JSON.parse(readFileSync(join(root, "data", "jobs.json"), "utf8"));
+    if (previous.jobs?.length) {
+      output = {
+        ...previous,
+        message: "Job source temporarily unavailable — showing previous results",
+      };
+      console.log(`Sources down — keeping ${previous.jobs.length} previous jobs.`);
+    }
+  } catch {}
+}
 
 mkdirSync(join(root, "data"), { recursive: true });
 writeFileSync(join(root, "data", "jobs.json"), JSON.stringify(output, null, 2) + "\n");
