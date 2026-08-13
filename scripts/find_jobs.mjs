@@ -8,6 +8,7 @@
 //   ANTHROPIC_API_KEY               — enables Claude re-ranking with per-job reasons
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -336,6 +337,55 @@ function scoreJob(job) {
 // Optional Claude re-ranking
 // ---------------------------------------------------------------------------
 
+function buildRankingInput(candidates) {
+  const jobList = candidates.map((j) => ({
+    id: j.id,
+    title: j.title,
+    company: j.company,
+    location: j.location,
+    salary: j.salaryMin || j.salaryMax
+      ? `${j.salaryMin ?? "?"}-${j.salaryMax ?? "?"} ${j.salaryPredicted ? "(estimated)" : ""}`
+      : "not listed",
+    statedExperience: j.requiredYears
+      ? `${j.requiredYears.min}${j.requiredYears.max === null ? "+" : `-${j.requiredYears.max}`} years`
+      : "not stated",
+    posted: j.posted,
+    snippet: (j.description || "").slice(0, 500),
+  }));
+
+  const profile = {
+    targetRoles: prefs.roles,
+    experience: `${prefs.experienceYears} years (mid-level, strict)`,
+    minimumSalary: `${prefs.salaryMin} ${prefs.currency}`,
+    location: `${prefs.location.city}, Australia (on-site/hybrid)`,
+  };
+
+  const instruction =
+    `Select the best matches (at most ${TOP_N}), scored 0-100 for fit with a one-line ` +
+    "reason each. Prioritise radio/RF/telecommunications relevance, then salary fit, " +
+    "then experience fit. The experience band is strict: the candidate has " +
+    `${prefs.experienceYears} years, so exclude roles that state a requirement above ` +
+    "that band (e.g. 7+ years), roles pitched at principal/leadership level, and " +
+    "junior/graduate roles. A plain 'Senior' title is acceptable only if the ad " +
+    "suggests it suits someone with ~5 years. Omit jobs that are clearly irrelevant " +
+    "or clearly below the salary floor.";
+
+  return { jobList, profile, instruction };
+}
+
+function applyRanking(ranked, candidates, label) {
+  const byId = new Map(candidates.map((j) => [j.id, j]));
+  const result = [];
+  for (const r of ranked) {
+    const job = byId.get(r.id);
+    if (job) result.push({ ...job, score: r.score, reason: r.reason });
+  }
+  result.sort((a, b) => b.score - a.score);
+  console.log(`${label}: kept ${result.length} of ${candidates.length} candidates.`);
+  return result.slice(0, TOP_N);
+}
+
+// Backend 1: Anthropic API (ANTHROPIC_API_KEY secret) with structured outputs.
 async function rankWithClaude(candidates) {
   if (!process.env.ANTHROPIC_API_KEY) return null;
 
@@ -348,17 +398,7 @@ async function rankWithClaude(candidates) {
   }
 
   const client = new Anthropic();
-  const jobList = candidates.map((j) => ({
-    id: j.id,
-    title: j.title,
-    company: j.company,
-    location: j.location,
-    salary: j.salaryMin || j.salaryMax
-      ? `${j.salaryMin ?? "?"}-${j.salaryMax ?? "?"} ${j.salaryPredicted ? "(estimated)" : ""}`
-      : "not listed",
-    posted: j.posted,
-    snippet: (j.description || "").slice(0, 500),
-  }));
+  const { jobList, profile, instruction } = buildRankingInput(candidates);
 
   const schema = {
     type: "object",
@@ -393,45 +433,54 @@ async function rankWithClaude(candidates) {
         {
           role: "user",
           content:
-            `Candidate profile:\n${JSON.stringify(
-              {
-                targetRoles: prefs.roles,
-                experience: `${prefs.experienceYears} years (mid-level, strict)`,
-                minimumSalary: `${prefs.salaryMin} ${prefs.currency}`,
-                location: `${prefs.location.city}, Australia (on-site/hybrid)`,
-              },
-              null,
-              2,
-            )}\n\nJob listings:\n${JSON.stringify(jobList, null, 2)}\n\n` +
-            `Select the best matches (at most ${TOP_N}), scored 0-100 for fit with a one-line ` +
-            "reason each. Prioritise radio/RF/telecommunications relevance, then salary fit, " +
-            "then experience fit. The experience band is strict: the candidate has " +
-            `${prefs.experienceYears} years, so exclude roles that state a requirement above ` +
-            "that band (e.g. 7+ years), roles pitched at principal/leadership level, and " +
-            "junior/graduate roles. A plain 'Senior' title is acceptable only if the ad " +
-            "suggests it suits someone with ~5 years. Omit jobs that are clearly irrelevant " +
-            "or clearly below the salary floor.",
+            `Candidate profile:\n${JSON.stringify(profile, null, 2)}\n\n` +
+            `Job listings:\n${JSON.stringify(jobList, null, 2)}\n\n${instruction}`,
         },
       ],
     });
 
     if (response.stop_reason === "refusal") {
-      console.error("Claude ranking: request refused — using heuristic ranking.");
+      console.error("Claude ranking: request refused — trying next backend.");
       return null;
     }
     const text = response.content.find((b) => b.type === "text")?.text;
-    const ranked = JSON.parse(text).jobs;
-    const byId = new Map(candidates.map((j) => [j.id, j]));
-    const result = [];
-    for (const r of ranked) {
-      const job = byId.get(r.id);
-      if (job) result.push({ ...job, score: r.score, reason: r.reason });
-    }
-    result.sort((a, b) => b.score - a.score);
-    console.log(`Claude ranking: kept ${result.length} of ${candidates.length} candidates.`);
-    return result.slice(0, TOP_N);
+    return applyRanking(JSON.parse(text).jobs, candidates, "Claude API ranking");
   } catch (err) {
-    console.error(`Claude ranking failed: ${err.message} — using heuristic ranking.`);
+    console.error(`Claude API ranking failed: ${err.message} — trying next backend.`);
+    return null;
+  }
+}
+
+// Backend 2: Claude Code CLI using a Claude Pro/Max subscription
+// (CLAUDE_CODE_OAUTH_TOKEN secret from `claude setup-token`). No API billing —
+// usage comes out of the subscription's quota.
+function rankWithClaudeCode(candidates) {
+  if (!process.env.CLAUDE_CODE_OAUTH_TOKEN) return null;
+
+  const { jobList, profile, instruction } = buildRankingInput(candidates);
+  const stdinPayload = JSON.stringify({ candidateProfile: profile, jobListings: jobList }, null, 2);
+  const prompt =
+    "You are ranking job listings for a candidate. The JSON on stdin contains " +
+    `the candidate profile and the listings. ${instruction} ` +
+    'Respond with ONLY a JSON object of the form {"jobs":[{"id":"...","score":0,"reason":"..."}]} — no prose, no code fences.';
+
+  try {
+    const proc = spawnSync("claude", ["-p", prompt, "--output-format", "json", "--allowedTools", ""], {
+      input: stdinPayload,
+      encoding: "utf8",
+      timeout: 240000,
+      maxBuffer: 10 * 1024 * 1024,
+    });
+    if (proc.error) throw proc.error;
+    if (proc.status !== 0) throw new Error(`claude exited ${proc.status}: ${(proc.stderr || "").slice(0, 300)}`);
+
+    const envelope = JSON.parse(proc.stdout);
+    const text = envelope.result || "";
+    const jsonText = text.match(/\{[\s\S]*\}/)?.[0];
+    if (!jsonText) throw new Error("no JSON found in response");
+    return applyRanking(JSON.parse(jsonText).jobs, candidates, "Claude subscription ranking");
+  } catch (err) {
+    console.error(`Claude subscription ranking failed: ${err.message} — trying next backend.`);
     return null;
   }
 }
@@ -485,7 +534,7 @@ if (prefs.experienceStrict) {
 // When Claude ranking is available the bars drop, since borderline candidates
 // get properly judged before publishing; Adzuna truncates descriptions, so
 // keyword counting alone underrates genuinely relevant listings.
-const claudeEnabled = Boolean(process.env.ANTHROPIC_API_KEY);
+const claudeEnabled = Boolean(process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_CODE_OAUTH_TOKEN);
 for (const job of candidates) job.score = scoreJob(job);
 candidates = candidates
   .filter((j) => {
@@ -500,7 +549,8 @@ candidates = candidates
 
 console.log(`${candidates.length} candidates after filtering.`);
 
-let top = await rankWithClaude(candidates);
+let top = candidates.length === 0 ? [] : await rankWithClaude(candidates);
+if (!top) top = rankWithClaudeCode(candidates);
 if (!top) {
   top = candidates.slice(0, TOP_N).map((j) => ({
     ...j,

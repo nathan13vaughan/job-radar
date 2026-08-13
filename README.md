@@ -41,9 +41,29 @@ The free tier allows 1,000 calls/month; this project uses ~150.
 
 ### 2. Claude re-ranking (optional, recommended)
 
-With an Anthropic API key, Claude reads each day's candidate list and picks the best
-matches with a one-line "why it fits" reason shown on the widget. Without it, a
-keyword/salary/recency scoring formula is used instead.
+With Claude ranking enabled, Claude reads each day's candidate list and picks the
+best matches with a one-line "why it fits" reason shown on the widget, applying the
+strict 3–5 year experience band. Without it, a keyword/salary/recency scoring
+formula is used instead. Two ways to enable it — pick **one**:
+
+**Option A — Claude subscription (no extra cost if you have Claude Pro/Max):**
+
+1. In a terminal on your computer, run:
+
+   ```bash
+   claude setup-token
+   ```
+
+   It opens a browser to authorise, then prints a long-lived token (valid ~1 year).
+2. Add it as a secret:
+
+   ```bash
+   gh secret set CLAUDE_CODE_OAUTH_TOKEN --repo nathan13vaughan/job-radar
+   ```
+
+The daily run uses a small slice of your plan's usage quota instead of billing.
+
+**Option B — Anthropic API key (pay per use):**
 
 1. Create a key at <https://platform.claude.com> (Console → API keys).
 2. Add it as a secret:
@@ -52,7 +72,8 @@ keyword/salary/recency scoring formula is used instead.
    gh secret set ANTHROPIC_API_KEY --repo nathan13vaughan/job-radar
    ```
 
-Cost is roughly US$0.05–0.15 per day (one Claude Opus call over ~25 job snippets).
+Cost is roughly US$0.05–0.15 per day. If both secrets are set, the API key is
+used first and the subscription is the fallback.
 
 ### 3. iPhone widget
 
