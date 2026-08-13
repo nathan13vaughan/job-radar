@@ -482,11 +482,17 @@ function rankWithClaudeCode(candidates) {
     });
     if (proc.error) throw proc.error;
     if (proc.status !== 0) {
-      const detail = [proc.stderr, proc.stdout]
-        .map((s) => (s || "").trim())
-        .filter(Boolean)
-        .join(" | ")
-        .slice(0, 400);
+      let detail = "";
+      try {
+        detail = JSON.parse(proc.stdout).result || "";
+      } catch {}
+      if (!detail) {
+        detail = [proc.stderr, proc.stdout]
+          .map((s) => (s || "").trim())
+          .filter(Boolean)
+          .join(" | ")
+          .slice(0, 400);
+      }
       throw new Error(`claude exited ${proc.status}: ${detail || "(no output)"}`);
     }
 
