@@ -1,0 +1,71 @@
+{
+  "roles": [
+    "Radio Systems Engineer",
+    "Telecommunications Engineer",
+    "RF Engineer",
+    "Project Engineer Telecommunications",
+    "Radio Network Engineer"
+  ],
+  "experienceLevel": "mid",
+  "experienceYears": "2-5",
+  "salaryMin": 110000,
+  "currency": "AUD",
+  "location": {
+    "city": "Melbourne",
+    "region": "VIC",
+    "country": "au",
+    "maxDistanceKm": 50
+  },
+  "titleKeywords": [
+    "radio",
+    "telecom",
+    "telecommunications",
+    "rf",
+    "wireless",
+    "microwave",
+    "spectrum",
+    "two-way",
+    "radiocommunications"
+  ],
+  "descriptionKeywords": [
+    "dmr",
+    "p25",
+    "tetra",
+    "lmr",
+    "two-way radio",
+    "land mobile radio",
+    "mission critical",
+    "rf design",
+    "microwave link",
+    "vhf",
+    "uhf",
+    "spectrum",
+    "antenna",
+    "base station",
+    "repeater",
+    "radio network",
+    "telemetry",
+    "scada",
+    "transmission",
+    "lte",
+    "5g",
+    "in-building coverage",
+    "motorola",
+    "tait",
+    "hytera",
+    "kenwood",
+    "acma"
+  ],
+  "excludeTitleWords": [
+    "graduate",
+    "intern",
+    "internship",
+    "apprentice",
+    "trainee",
+    "principal",
+    "director",
+    "head of",
+    "chief",
+    "general manager"
+  ]
+}

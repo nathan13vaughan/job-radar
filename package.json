@@ -1,0 +1,13 @@
+{
+  "name": "job-radar",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Daily job finder for the Job Radar iPhone widget",
+  "scripts": {
+    "find": "node scripts/find_jobs.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.70.0"
+  }
+}
