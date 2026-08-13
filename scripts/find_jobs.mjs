@@ -549,8 +549,17 @@ candidates = candidates
 
 console.log(`${candidates.length} candidates after filtering.`);
 
-let top = candidates.length === 0 ? [] : await rankWithClaude(candidates);
-if (!top) top = rankWithClaudeCode(candidates);
+let top = null;
+let rankedBy = "keyword";
+if (candidates.length > 0) {
+  top = await rankWithClaude(candidates);
+  if (top) {
+    rankedBy = "claude-api";
+  } else {
+    top = rankWithClaudeCode(candidates);
+    if (top) rankedBy = "claude-subscription";
+  }
+}
 if (!top) {
   top = candidates.slice(0, TOP_N).map((j) => ({
     ...j,
@@ -570,6 +579,8 @@ let output = {
   updated: new Date().toISOString(),
   setupNeeded: !adzuna.available,
   message,
+  rankedBy,
+  criteria: `${prefs.experienceYears} yrs · $${Math.round(prefs.salaryMin / 1000)}k+ · ${prefs.location.city}`,
   jobs: top.map((j) => ({
     title: j.title,
     company: j.company,

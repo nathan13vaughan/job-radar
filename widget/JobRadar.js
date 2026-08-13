@@ -74,6 +74,12 @@ async function loadData() {
   }
 }
 
+function rankLabel(data) {
+  if (data.rankedBy === "claude-api" || data.rankedBy === "claude-subscription") return "✦ Claude-ranked";
+  if (data.rankedBy === "keyword") return "keyword-ranked";
+  return null;
+}
+
 function updatedLabel(iso) {
   if (!iso) return "";
   const df = new DateFormatter();
@@ -232,6 +238,24 @@ function buildWidget(data) {
     note.font = Font.italicSystemFont(8.5);
     note.textColor = SECONDARY;
     note.lineLimit = 1;
+  } else if (family !== "small") {
+    // Footer: the active filters and how the list was ranked.
+    const footer = widget.addStack();
+    footer.centerAlignContent();
+    if (data.criteria) {
+      const crit = footer.addText(data.criteria);
+      crit.font = Font.systemFont(8);
+      crit.textColor = SECONDARY;
+      crit.lineLimit = 1;
+    }
+    footer.addSpacer();
+    const rank = rankLabel(data);
+    if (rank) {
+      const rankText = footer.addText(rank);
+      rankText.font = Font.mediumSystemFont(8);
+      rankText.textColor = rank.startsWith("✦") ? ACCENT : SECONDARY;
+      rankText.lineLimit = 1;
+    }
   }
   return widget;
 }
@@ -248,7 +272,12 @@ function presentTable(data) {
   headerRow.isHeader = true;
   headerRow.addText(
     "📡 Job Radar",
-    [data.jobs.length ? `${data.jobs.length} matches` : null, data.updated ? `updated ${updatedLabel(data.updated)}` : null]
+    [
+      data.jobs.length ? `${data.jobs.length} matches` : null,
+      data.criteria || null,
+      rankLabel(data),
+      data.updated ? `updated ${updatedLabel(data.updated)}` : null,
+    ]
       .filter(Boolean)
       .join(" · "),
   );
