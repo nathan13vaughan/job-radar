@@ -4,7 +4,9 @@
     "Telecommunications Engineer",
     "RF Engineer",
     "Project Engineer Telecommunications",
-    "Radio Network Engineer"
+    "Radio Network Engineer",
+    "Systems Engineer",
+    "Communications Engineer"
   ],
   "experienceLevel": "mid",
   "experienceYears": "3-5",
@@ -26,7 +28,12 @@
     "microwave",
     "spectrum",
     "two-way",
-    "radiocommunications"
+    "radiocommunications",
+    "comms",
+    "systems engineer",
+    "systems engineering",
+    "communications engineer",
+    "mission systems"
   ],
   "descriptionKeywords": [
     "dmr",
@@ -76,7 +83,17 @@
     "frontend",
     "backend",
     "full stack",
-    "quality"
+    "quality",
+    "windows",
+    "vmware",
+    "azure",
+    "aws",
+    "cloud",
+    "m365",
+    "sccm",
+    "citrix",
+    "intune",
+    "servicenow"
   ],
   "excludeTitleWords": [
     "graduate",

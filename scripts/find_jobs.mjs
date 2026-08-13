@@ -132,6 +132,16 @@ function extractRequiredYears(text) {
   return null;
 }
 
+// Rough Melbourne-market expected salary (AUD/year) when the ad states nothing
+// and no better estimate is available. Always displayed with a leading "~".
+function heuristicEstimate(job) {
+  const t = job.title.toLowerCase();
+  if (/technician|technologist|rigger/.test(t)) return "~$80–100k";
+  if (/senior|lead|specialist|principal/.test(t)) return "~$125–155k";
+  if (/project engineer/.test(t)) return "~$105–135k";
+  return "~$95–125k";
+}
+
 // Human-readable salary for the widget, e.g. "$110k–$130k", "$85/hr", "$120k est."
 function formatSalary(j) {
   if (!j.salaryMin && !j.salaryMax) return null;
@@ -212,7 +222,7 @@ async function fetchAdzuna() {
       ...baseParams,
       results_per_page: "50",
       what_and: "engineer",
-      what_or: prefs.titleKeywords.join(" "),
+      what_or: prefs.titleKeywords.filter((k) => !k.includes(" ")).join(" "),
     });
     try {
       const n = collect(await fetchJson(`https://api.adzuna.com/v1/api/jobs/${prefs.location.country}/search/${page}?${params}`));
@@ -372,12 +382,17 @@ function buildRankingInput(candidates) {
   const instruction =
     `Select the best matches (at most ${TOP_N}), scored 0-100 for fit with a one-line ` +
     "reason each. Prioritise radio/RF/telecommunications relevance, then salary fit, " +
-    "then experience fit. The experience band is strict: the candidate has " +
-    `${prefs.experienceYears} years, so exclude roles that state a requirement above ` +
-    "that band (e.g. 7+ years), roles pitched at principal/leadership level, and " +
-    "junior/graduate roles. A plain 'Senior' title is acceptable only if the ad " +
-    "suggests it suits someone with ~5 years. Omit jobs that are clearly irrelevant " +
-    "or clearly below the salary floor.";
+    "then experience fit. Systems engineering roles are relevant when connected to " +
+    "radio, RF, communications, defence, or mission systems — exclude pure IT " +
+    "infrastructure 'systems engineer' roles (Windows/cloud/sysadmin). The experience " +
+    `band is strict: the candidate has ${prefs.experienceYears} years, so exclude ` +
+    "roles that state a requirement above that band (e.g. 7+ years), roles pitched at " +
+    "principal/leadership level, and junior/graduate roles. A plain 'Senior' title is " +
+    "acceptable only if the ad suggests it suits someone with ~5 years. Omit jobs that " +
+    "are clearly irrelevant or clearly below the salary floor. For every selected job " +
+    'also provide salaryEstimate: the stated salary if the ad gives one, otherwise a ' +
+    'realistic annual AUD range for this role at this level in Melbourne, formatted ' +
+    'exactly like "$120–140k".';
 
   return { jobList, profile, instruction };
 }
@@ -387,7 +402,10 @@ function applyRanking(ranked, candidates, label) {
   const result = [];
   for (const r of ranked) {
     const job = byId.get(r.id);
-    if (job) result.push({ ...job, score: r.score, reason: r.reason });
+    if (!job) continue;
+    const est = (r.salaryEstimate || "").trim();
+    if (est) job.claudeEstimate = est.startsWith("~") ? est : `~${est}`;
+    result.push({ ...job, score: r.score, reason: r.reason });
   }
   result.sort((a, b) => b.score - a.score);
   console.log(`${label}: kept ${result.length} of ${candidates.length} candidates.`);
@@ -420,8 +438,9 @@ async function rankWithClaude(candidates) {
             id: { type: "string" },
             score: { type: "integer" },
             reason: { type: "string" },
+            salaryEstimate: { type: "string" },
           },
-          required: ["id", "score", "reason"],
+          required: ["id", "score", "reason", "salaryEstimate"],
           additionalProperties: false,
         },
       },
@@ -471,7 +490,7 @@ function rankWithClaudeCode(candidates) {
   const prompt =
     "You are ranking job listings for a candidate. The JSON on stdin contains " +
     `the candidate profile and the listings. ${instruction} ` +
-    'Respond with ONLY a JSON object of the form {"jobs":[{"id":"...","score":0,"reason":"..."}]} — no prose, no code fences.';
+    'Respond with ONLY a JSON object of the form {"jobs":[{"id":"...","score":0,"reason":"...","salaryEstimate":"$120–140k"}]} — no prose, no code fences.';
 
   try {
     const proc = spawnSync("claude", ["-p", prompt, "--output-format", "json", "--allowedTools", ""], {
@@ -616,7 +635,8 @@ let output = {
     title: j.title,
     company: j.company,
     location: j.location,
-    salary: formatSalary(j),
+    salary: formatSalary(j) || j.claudeEstimate || heuristicEstimate(j),
+    salaryEstimated: !formatSalary(j),
     experience: j.requiredYears
       ? j.requiredYears.max !== null && j.requiredYears.max !== j.requiredYears.min
         ? `${j.requiredYears.min}-${j.requiredYears.max} yrs`

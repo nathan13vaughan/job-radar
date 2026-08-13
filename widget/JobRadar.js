@@ -23,10 +23,13 @@ const API_URL = `https://api.github.com/repos/${GITHUB_USER}/${REPO}/contents/da
 
 const ACCENT = Color.dynamic(new Color("#2563eb"), new Color("#60a5fa"));
 const SALARY = Color.dynamic(new Color("#15803d"), new Color("#4ade80"));
-const PRIMARY = Color.dynamic(new Color("#111827"), new Color("#f3f4f6"));
-const SECONDARY = Color.dynamic(new Color("#6b7280"), new Color("#9ca3af"));
+const SALARY_BG = Color.dynamic(new Color("#16a34a", 0.14), new Color("#4ade80", 0.16));
+const EST = Color.dynamic(new Color("#b45309"), new Color("#fbbf24"));
+const EST_BG = Color.dynamic(new Color("#d97706", 0.13), new Color("#fbbf24", 0.15));
+const PRIMARY = Color.dynamic(new Color("#0f172a"), new Color("#f8fafc"));
+const SECONDARY = Color.dynamic(new Color("#64748b"), new Color("#94a3b8"));
 const BG_TOP = Color.dynamic(new Color("#ffffff"), new Color("#1c2030"));
-const BG_BOTTOM = Color.dynamic(new Color("#eef1f7"), new Color("#0f1118"));
+const BG_BOTTOM = Color.dynamic(new Color("#e8edf5"), new Color("#0f1118"));
 
 function badgeColor(score) {
   if (score >= 80) return new Color("#16a34a");
@@ -134,24 +137,28 @@ function addJobRow(widget, job, opts) {
   left.layoutVertically();
 
   const titleText = left.addText(job.title);
-  titleText.font = Font.semiboldSystemFont(opts.titleSize);
+  titleText.font = Font.boldSystemFont(opts.titleSize);
   titleText.textColor = PRIMARY;
   titleText.lineLimit = 1;
 
-  left.addSpacer(1);
+  left.addSpacer(2);
   const sub = left.addStack();
   sub.centerAlignContent();
   if (job.salary) {
-    const salaryText = sub.addText(job.salary);
-    salaryText.font = Font.semiboldSystemFont(opts.subSize);
-    salaryText.textColor = SALARY;
+    // Salary pill: green for stated pay, amber for an estimate (~).
+    const estimated = job.salaryEstimated || job.salary.startsWith("~");
+    const chip = sub.addStack();
+    chip.backgroundColor = estimated ? EST_BG : SALARY_BG;
+    chip.cornerRadius = 6;
+    chip.setPadding(1.5, 5, 1.5, 5);
+    const salaryText = chip.addText(job.salary);
+    salaryText.font = Font.boldSystemFont(opts.subSize);
+    salaryText.textColor = estimated ? EST : SALARY;
     salaryText.lineLimit = 1;
-    const dot = sub.addText("  ·  ");
-    dot.font = Font.systemFont(opts.subSize);
-    dot.textColor = SECONDARY;
+    sub.addSpacer(6);
   }
   const companyText = sub.addText(job.company);
-  companyText.font = Font.systemFont(opts.subSize);
+  companyText.font = Font.mediumSystemFont(opts.subSize);
   companyText.textColor = SECONDARY;
   companyText.lineLimit = 1;
 
@@ -218,10 +225,10 @@ function buildWidget(data) {
   }
 
   const layouts = {
-    small: { rows: 2, titleSize: 10.5, subSize: 9, badge: false, thirdLine: false, gap: 5 },
-    medium: { rows: 4, titleSize: 11.5, subSize: 9.5, badge: true, thirdLine: false, gap: 5 },
-    large: { rows: 6, titleSize: 12, subSize: 10, badge: true, thirdLine: true, gap: 6 },
-    extraLarge: { rows: 6, titleSize: 13, subSize: 11, badge: true, thirdLine: true, gap: 8 },
+    small: { rows: 2, titleSize: 11, subSize: 9, badge: false, thirdLine: false, gap: 6 },
+    medium: { rows: 3, titleSize: 12.5, subSize: 10, badge: true, thirdLine: false, gap: 8 },
+    large: { rows: 6, titleSize: 12.5, subSize: 10, badge: true, thirdLine: true, gap: 7 },
+    extraLarge: { rows: 6, titleSize: 13.5, subSize: 11, badge: true, thirdLine: true, gap: 9 },
   };
   const opts = layouts[family] || layouts.medium;
 
