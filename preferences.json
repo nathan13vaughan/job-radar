@@ -56,6 +56,27 @@
     "kenwood",
     "acma"
   ],
+  "penaltyTitleWords": [
+    "software",
+    "civil",
+    "mechanical",
+    "chemical",
+    "structural",
+    "production",
+    "process",
+    "geotech",
+    "marine",
+    "mining",
+    "hvac",
+    "facade",
+    "precast",
+    "pre-cast",
+    "devops",
+    "frontend",
+    "backend",
+    "full stack",
+    "quality"
+  ],
   "excludeTitleWords": [
     "graduate",
     "intern",

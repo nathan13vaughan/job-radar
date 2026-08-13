@@ -275,6 +275,9 @@ function scoreJob(job) {
   }
   if (title.includes("engineer")) score += 8;
   if (title.includes("senior")) score -= 5; // mid-level target; senior is borderline
+  for (const w of prefs.penaltyTitleWords || []) {
+    if (title.includes(w)) score -= 25; // wrong engineering discipline
+  }
 
   // Description relevance.
   let descHits = 0;
@@ -431,7 +434,7 @@ for (const job of candidates) job.score = scoreJob(job);
 candidates = candidates
   .filter((j) => {
     if (titleHasDomainKeyword(j.title)) return j.score >= 15;
-    if (j.title.toLowerCase().includes("engineer")) return j.descHits >= 4 && j.score >= 30;
+    if (j.title.toLowerCase().includes("engineer")) return j.descHits >= 3 && j.score >= 25;
     return false;
   })
   .sort((a, b) => b.score - a.score)
