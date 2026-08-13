@@ -285,9 +285,18 @@ function daysOld(job) {
   return (Date.now() - new Date(job.posted).getTime()) / 86400000;
 }
 
+// Word-boundary keyword matching: "radio" must not match "radiologist",
+// while "telecom" should still match "telecommunications".
+function keywordInTitle(kw, titleLower) {
+  if (kw === "rf") return /\brf\b/.test(titleLower);
+  if (kw.startsWith("telecom")) return /\btelecom\w*/.test(titleLower);
+  const esc = kw.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`\\b${esc}s?\\b`).test(titleLower);
+}
+
 function titleHasDomainKeyword(title) {
   const t = title.toLowerCase();
-  return prefs.titleKeywords.some((kw) => (kw === "rf" ? /\brf\b/.test(t) : t.includes(kw)));
+  return prefs.titleKeywords.some((kw) => keywordInTitle(kw, t));
 }
 
 function scoreJob(job) {
@@ -297,7 +306,7 @@ function scoreJob(job) {
 
   // Title relevance (the strongest signal).
   for (const kw of prefs.titleKeywords) {
-    if (kw === "rf" ? /\brf\b/.test(title) : title.includes(kw)) score += 12;
+    if (keywordInTitle(kw, title)) score += 12;
   }
   if (title.includes("engineer")) score += 8;
   if (title.includes("senior")) score -= 5; // mid-level target; senior is borderline
@@ -472,7 +481,14 @@ function rankWithClaudeCode(candidates) {
       maxBuffer: 10 * 1024 * 1024,
     });
     if (proc.error) throw proc.error;
-    if (proc.status !== 0) throw new Error(`claude exited ${proc.status}: ${(proc.stderr || "").slice(0, 300)}`);
+    if (proc.status !== 0) {
+      const detail = [proc.stderr, proc.stdout]
+        .map((s) => (s || "").trim())
+        .filter(Boolean)
+        .join(" | ")
+        .slice(0, 400);
+      throw new Error(`claude exited ${proc.status}: ${detail || "(no output)"}`);
+    }
 
     const envelope = JSON.parse(proc.stdout);
     const text = envelope.result || "";
@@ -536,14 +552,18 @@ if (prefs.experienceStrict) {
 // keyword counting alone underrates genuinely relevant listings.
 const claudeEnabled = Boolean(process.env.ANTHROPIC_API_KEY || process.env.CLAUDE_CODE_OAUTH_TOKEN);
 for (const job of candidates) job.score = scoreJob(job);
+
+const strictPass = (j) =>
+  titleHasDomainKeyword(j.title)
+    ? j.score >= 15
+    : j.title.toLowerCase().includes("engineer") && j.descHits >= 3 && j.score >= 25;
+const loosePass = (j) =>
+  titleHasDomainKeyword(j.title)
+    ? j.score >= 8
+    : j.title.toLowerCase().includes("engineer") && j.descHits >= 1 && j.score >= 15;
+
 candidates = candidates
-  .filter((j) => {
-    if (titleHasDomainKeyword(j.title)) return j.score >= (claudeEnabled ? 8 : 15);
-    if (j.title.toLowerCase().includes("engineer")) {
-      return claudeEnabled ? j.descHits >= 1 && j.score >= 15 : j.descHits >= 3 && j.score >= 25;
-    }
-    return false;
-  })
+  .filter(claudeEnabled ? loosePass : strictPass)
   .sort((a, b) => b.score - a.score)
   .slice(0, MAX_CANDIDATES_FOR_RANKING);
 
@@ -561,11 +581,16 @@ if (candidates.length > 0) {
   }
 }
 if (!top) {
-  top = candidates.slice(0, TOP_N).map((j) => ({
-    ...j,
-    score: Math.max(0, Math.min(100, Math.round(j.score * 1.4))),
-    reason: null,
-  }));
+  // Heuristic fallback publishes only strict-gate candidates — the loosened
+  // pool exists solely for Claude to judge, and Claude didn't run.
+  top = candidates
+    .filter(strictPass)
+    .slice(0, TOP_N)
+    .map((j) => ({
+      ...j,
+      score: Math.max(0, Math.min(100, Math.round(j.score * 1.4))),
+      reason: null,
+    }));
 }
 
 let message = null;
