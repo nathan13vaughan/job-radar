@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-13T11:51:07.412Z",
+  "updated": "2026-08-13T11:58:52.767Z",
   "setupNeeded": false,
   "message": null,
   "jobs": [
@@ -8,11 +8,22 @@
       "company": "WSP USA",
       "location": "Melbourne, Melbourne Region",
       "salary": null,
-      "url": "https://www.adzuna.com.au/land/ad/5831482406?se=fBTARA2X8RGEb7TtygE8KQ&utm_medium=api&utm_source=1bc3321f&v=2D6C57B1579CA05AB54E32C4B850D21265F50D23",
+      "url": "https://www.adzuna.com.au/land/ad/5831482406?se=FN0SWQ6X8RGmQ-I_OROTUA&utm_medium=api&utm_source=1bc3321f&v=2D6C57B1579CA05AB54E32C4B850D21265F50D23",
       "score": 52,
       "reason": null,
       "source": "Adzuna",
       "posted": "2026-08-07T13:00:09Z"
+    },
+    {
+      "title": "Project Engineer (Pre-cast)",
+      "company": "CPB Contractors",
+      "location": "South Yarra, Stonnington Area",
+      "salary": null,
+      "url": "https://www.adzuna.com.au/details/5835393379?utm_medium=api&utm_source=1bc3321f",
+      "score": 29,
+      "reason": null,
+      "source": "Adzuna",
+      "posted": "2026-08-10T18:24:08Z"
     },
     {
       "title": "OT Engineer",
@@ -26,15 +37,81 @@
       "posted": "2026-07-31T04:19:39Z"
     },
     {
-      "title": "Expression of Interest - Senior Electronics Engineer - RF",
-      "company": "Hydrix Pty",
-      "location": "Melbourne, Melbourne Region",
+      "title": "Mission Systems Engineer",
+      "company": "Leidos",
+      "location": "Scoresby, Knox Area",
       "salary": null,
-      "url": "https://www.adzuna.com.au/details/5810210379?utm_medium=api&utm_source=1bc3321f",
-      "score": 21,
+      "url": "https://www.adzuna.com.au/land/ad/5839331224?se=VDp_WQ6X8RG1KO25_Z8IuQ&utm_medium=api&utm_source=1bc3321f&v=5E7DF53F010CA8DA6ADBD1C524E2C4EE32BC57E5",
+      "score": 25,
       "reason": null,
       "source": "Adzuna",
-      "posted": "2026-07-22T11:32:32Z"
+      "posted": "2026-08-13T13:02:31Z"
+    },
+    {
+      "title": "Engineering & Release Lead",
+      "company": "Movember",
+      "location": "Richmond North, Yarra Area",
+      "salary": null,
+      "url": "https://www.adzuna.com.au/details/5838780329?utm_medium=api&utm_source=1bc3321f",
+      "score": 25,
+      "reason": null,
+      "source": "Adzuna",
+      "posted": "2026-08-13T07:39:18Z"
+    },
+    {
+      "title": "Production Engineering Manager",
+      "company": "Canva",
+      "location": "Melbourne, Melbourne Region",
+      "salary": null,
+      "url": "https://www.adzuna.com.au/details/5838721588?utm_medium=api&utm_source=1bc3321f",
+      "score": 25,
+      "reason": null,
+      "source": "Adzuna",
+      "posted": "2026-08-13T05:55:50Z"
+    },
+    {
+      "title": "Production Engineer - Fabrication",
+      "company": "ARB Australia",
+      "location": "Kilsyth South, Maroondah Area",
+      "salary": null,
+      "url": "https://www.adzuna.com.au/details/5838613137?utm_medium=api&utm_source=1bc3321f",
+      "score": 25,
+      "reason": null,
+      "source": "Adzuna",
+      "posted": "2026-08-13T02:27:50Z"
+    },
+    {
+      "title": "Engineering Standards & Excellence Lead",
+      "company": "Westpac",
+      "location": "South Yarra, Stonnington Area",
+      "salary": null,
+      "url": "https://www.adzuna.com.au/details/5838612928?utm_medium=api&utm_source=1bc3321f",
+      "score": 25,
+      "reason": null,
+      "source": "Adzuna",
+      "posted": "2026-08-13T02:27:47Z"
+    },
+    {
+      "title": "Software Engineer",
+      "company": "BAE Systems",
+      "location": "Richmond North, Yarra Area",
+      "salary": null,
+      "url": "https://www.adzuna.com.au/details/5838611692?utm_medium=api&utm_source=1bc3321f",
+      "score": 25,
+      "reason": null,
+      "source": "Adzuna",
+      "posted": "2026-08-13T02:27:32Z"
+    },
+    {
+      "title": "Training Designer (Marine Engineering)",
+      "company": "BAE Systems",
+      "location": "South Yarra, Stonnington Area",
+      "salary": null,
+      "url": "https://www.adzuna.com.au/details/5838611625?utm_medium=api&utm_source=1bc3321f",
+      "score": 25,
+      "reason": null,
+      "source": "Adzuna",
+      "posted": "2026-08-13T02:27:31Z"
     }
   ]
 }
