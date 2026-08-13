@@ -1,22 +1,10 @@
 {
-  "updated": "2026-08-13T14:25:07.106Z",
+  "updated": "2026-08-13T14:29:52.320Z",
   "setupNeeded": false,
   "message": null,
-  "rankedBy": "keyword",
+  "rankedBy": "claude-subscription",
   "criteria": "3-5 yrs · $110k+ · Melbourne",
   "jobs": [
-    {
-      "title": "Senior Telecommunications Engineer, Specialist - AUS Wide",
-      "company": "WSP USA",
-      "location": "Melbourne, Melbourne Region",
-      "salary": null,
-      "experience": null,
-      "url": "https://www.adzuna.com.au/land/ad/5831482406?se=xmtswyKX8RG1g66AfQDv_A&utm_medium=api&utm_source=1bc3321f&v=2D6C57B1579CA05AB54E32C4B850D21265F50D23",
-      "score": 52,
-      "reason": null,
-      "source": "Adzuna",
-      "posted": "2026-08-07T13:00:09Z"
-    },
     {
       "title": "Expression of Interest - Senior Electronics Engineer - RF",
       "company": "Hydrix Pty",
@@ -24,10 +12,22 @@
       "salary": null,
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5810210379?utm_medium=api&utm_source=1bc3321f",
-      "score": 21,
-      "reason": null,
+      "score": 68,
+      "reason": "RF electronics engineering role directly matches RF specialisation, though EOI status and 'Senior' framing add some seniority risk.",
       "source": "Adzuna",
       "posted": "2026-07-22T11:32:32Z"
+    },
+    {
+      "title": "Senior Telecommunications Engineer, Specialist - AUS Wide",
+      "company": "WSP USA",
+      "location": "Melbourne, Melbourne Region",
+      "salary": null,
+      "experience": null,
+      "url": "https://www.adzuna.com.au/land/ad/5831482406?se=OGSSZCOX8RG1g66AfQDv_A&utm_medium=api&utm_source=1bc3321f&v=2D6C57B1579CA05AB54E32C4B850D21265F50D23",
+      "score": 58,
+      "reason": "Telecommunications engineering role at a major consultancy, but 'Senior Specialist' framing suggests it may skew above the 3-5yr band.",
+      "source": "Adzuna",
+      "posted": "2026-08-07T13:00:09Z"
     }
   ]
 }
