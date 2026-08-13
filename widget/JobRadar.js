@@ -191,6 +191,52 @@ function presentTable(data) {
 }
 
 // ---------------------------------------------------------------------------
+// Self-update: fetch the latest widget script from the repo and replace this
+// file, preserving the TOKEN configured above. Never breaks the widget — any
+// failure just means "no update this time".
+// ---------------------------------------------------------------------------
+
+async function selfUpdate() {
+  try {
+    const req = new Request(
+      `https://api.github.com/repos/${GITHUB_USER}/${REPO}/contents/widget/JobRadar.js?ref=${BRANCH}`,
+    );
+    req.headers = {
+      Accept: "application/vnd.github.raw+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      ...(TOKEN ? { Authorization: `Bearer ${TOKEN.trim()}` } : {}),
+    };
+    let remote = await req.loadString();
+    if (req.response?.statusCode !== 200) return;
+    if (!remote.includes("Job Radar") || remote.length < 1000) return; // sanity check
+
+    if (TOKEN) {
+      const withToken = remote.replace(/const TOKEN = "[^"]*";/, () => `const TOKEN = "${TOKEN.trim()}";`);
+      if (!withToken.includes(TOKEN.trim())) return; // pattern changed — don't risk wiping the token
+      remote = withToken;
+    }
+
+    // Scripts may live in iCloud Drive or local storage; pick the right FileManager.
+    let sfm = FileManager.local();
+    try {
+      const icloud = FileManager.iCloud();
+      if (icloud.fileExists(module.filename)) {
+        sfm = icloud;
+        await sfm.downloadFileFromiCloud(module.filename);
+      }
+    } catch (e) {}
+
+    const current = sfm.readString(module.filename);
+    if (current !== remote) {
+      sfm.writeString(module.filename, remote);
+      console.log("Job Radar: updated to the latest version from GitHub.");
+    }
+  } catch (e) {
+    console.log(`Job Radar: self-update skipped (${e})`);
+  }
+}
+
+// ---------------------------------------------------------------------------
 
 const data = await loadData();
 
@@ -199,4 +245,5 @@ if (config.runsInWidget) {
 } else {
   presentTable(data);
 }
+await selfUpdate();
 Script.complete();
