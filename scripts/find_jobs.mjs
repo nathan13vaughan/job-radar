@@ -240,6 +240,11 @@ function daysOld(job) {
   return (Date.now() - new Date(job.posted).getTime()) / 86400000;
 }
 
+function titleHasDomainKeyword(title) {
+  const t = title.toLowerCase();
+  return prefs.titleKeywords.some((kw) => (kw === "rf" ? /\brf\b/.test(t) : t.includes(kw)));
+}
+
 function scoreJob(job) {
   const title = job.title.toLowerCase();
   const desc = (job.description || "").toLowerCase();
@@ -257,6 +262,7 @@ function scoreJob(job) {
   for (const kw of prefs.descriptionKeywords) {
     if (desc.includes(kw)) descHits++;
   }
+  job.descHits = descHits;
   score += Math.min(descHits * 3, 21);
 
   // Salary fit (annual figures only — hourly/daily rates aren't comparable).
@@ -397,20 +403,18 @@ for (const job of candidates) {
   }
 }
 
-// A job must look relevant from its title alone — description keywords can
-// boost a match but never create one (stops e.g. logistics roles that merely
-// mention "transmission" from sneaking in).
-function titleRelevant(job) {
-  const title = job.title.toLowerCase();
-  return (
-    title.includes("engineer") ||
-    prefs.titleKeywords.some((kw) => (kw === "rf" ? /\brf\b/.test(title) : title.includes(kw)))
-  );
-}
-
+// Two-tier relevance gate:
+//  - a telecom/radio word in the title qualifies a job at a low score bar;
+//  - a generic "engineer" title must prove itself with several distinct
+//    domain keywords in the description (stops pre-cast/software/production
+//    engineer roles that mention one buzzword from sneaking in).
 for (const job of candidates) job.score = scoreJob(job);
 candidates = candidates
-  .filter((j) => titleRelevant(j) && j.score >= 15)
+  .filter((j) => {
+    if (titleHasDomainKeyword(j.title)) return j.score >= 15;
+    if (j.title.toLowerCase().includes("engineer")) return j.descHits >= 4 && j.score >= 30;
+    return false;
+  })
   .sort((a, b) => b.score - a.score)
   .slice(0, MAX_CANDIDATES_FOR_RANKING);
 
