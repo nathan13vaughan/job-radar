@@ -372,9 +372,20 @@ for (const job of candidates) {
   }
 }
 
+// A job must look relevant from its title alone — description keywords can
+// boost a match but never create one (stops e.g. logistics roles that merely
+// mention "transmission" from sneaking in).
+function titleRelevant(job) {
+  const title = job.title.toLowerCase();
+  return (
+    title.includes("engineer") ||
+    prefs.titleKeywords.some((kw) => (kw === "rf" ? /\brf\b/.test(title) : title.includes(kw)))
+  );
+}
+
 for (const job of candidates) job.score = scoreJob(job);
 candidates = candidates
-  .filter((j) => j.score >= 15) // must show some real relevance
+  .filter((j) => titleRelevant(j) && j.score >= 15)
   .sort((a, b) => b.score - a.score)
   .slice(0, MAX_CANDIDATES_FOR_RANKING);
 
