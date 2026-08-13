@@ -138,7 +138,7 @@ async function fetchAdzuna() {
     app_key: appKey,
     where: prefs.location.city,
     distance: String(prefs.location.maxDistanceKm),
-    max_days_old: "28",
+    max_days_old: "35",
     sort_by: "date",
   };
 
@@ -427,14 +427,20 @@ for (const job of candidates) {
 
 // Two-tier relevance gate:
 //  - a telecom/radio word in the title qualifies a job at a low score bar;
-//  - a generic "engineer" title must prove itself with several distinct
-//    domain keywords in the description (stops pre-cast/software/production
-//    engineer roles that mention one buzzword from sneaking in).
+//  - a generic "engineer" title must show domain keywords in the description
+//    (stops pre-cast/software/production engineer roles that mention one
+//    buzzword from sneaking in).
+// When Claude ranking is available the bars drop, since borderline candidates
+// get properly judged before publishing; Adzuna truncates descriptions, so
+// keyword counting alone underrates genuinely relevant listings.
+const claudeEnabled = Boolean(process.env.ANTHROPIC_API_KEY);
 for (const job of candidates) job.score = scoreJob(job);
 candidates = candidates
   .filter((j) => {
-    if (titleHasDomainKeyword(j.title)) return j.score >= 15;
-    if (j.title.toLowerCase().includes("engineer")) return j.descHits >= 3 && j.score >= 25;
+    if (titleHasDomainKeyword(j.title)) return j.score >= (claudeEnabled ? 8 : 15);
+    if (j.title.toLowerCase().includes("engineer")) {
+      return claudeEnabled ? j.descHits >= 1 && j.score >= 15 : j.descHits >= 3 && j.score >= 25;
+    }
     return false;
   })
   .sort((a, b) => b.score - a.score)
