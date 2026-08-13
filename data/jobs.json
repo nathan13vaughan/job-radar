@@ -1,48 +1,48 @@
 {
-  "updated": "2026-08-13T14:38:27.962Z",
+  "updated": "2026-08-13T20:35:51.257Z",
   "setupNeeded": false,
   "message": null,
   "rankedBy": "claude-subscription",
   "criteria": "3-5 yrs · $110k+ · Melbourne",
   "jobs": [
     {
-      "title": "Mission Systems Engineer",
-      "company": "Leidos",
-      "location": "Scoresby, Knox Area",
-      "salary": "~$115–140k",
+      "title": "Expression of Interest - Senior Electronics Engineer - RF",
+      "company": "Hydrix Pty",
+      "location": "Melbourne, Melbourne Region",
+      "salary": "~$120–140k",
       "salaryEstimated": true,
       "experience": null,
-      "url": "https://www.adzuna.com.au/land/ad/5839331224?se=qMuvkSSX8RG_yaSmB0dnHA&utm_medium=api&utm_source=1bc3321f&v=5E7DF53F010CA8DA6ADBD1C524E2C4EE32BC57E5",
-      "score": 78,
-      "reason": "Mission systems engineering at a defence prime, strongly aligned with radio/comms-heavy mission-critical systems work.",
+      "url": "https://www.adzuna.com.au/details/5810210379?utm_medium=api&utm_source=1bc3321f",
+      "score": 85,
+      "reason": "RF-specific electronics engineering role directly matching target RF Engineer profile",
       "source": "Adzuna",
-      "posted": "2026-08-13T13:02:31Z"
+      "posted": "2026-07-22T11:32:32Z"
     },
     {
       "title": "Senior Telecommunications Engineer, Specialist - AUS Wide",
       "company": "WSP USA",
       "location": "Melbourne, Melbourne Region",
-      "salary": "~$120–145k",
+      "salary": "~$130–150k",
       "salaryEstimated": true,
       "experience": null,
-      "url": "https://www.adzuna.com.au/land/ad/5831482406?se=uOVokCSX8RGtU5Il3Z8v3A&utm_medium=api&utm_source=1bc3321f&v=2D6C57B1579CA05AB54E32C4B850D21265F50D23",
-      "score": 72,
-      "reason": "Core telecommunications engineering consultancy role, directly matches candidate's target discipline.",
+      "url": "https://www.adzuna.com.au/land/ad/5831482406?se=nC2kflaX8RG_yaSmB0dnHA&utm_medium=api&utm_source=1bc3321f&v=2D6C57B1579CA05AB54E32C4B850D21265F50D23",
+      "score": 82,
+      "reason": "Direct telecommunications engineer role, core match for candidate's target discipline",
       "source": "Adzuna",
       "posted": "2026-08-07T13:00:09Z"
     },
     {
-      "title": "Expression of Interest - Senior Electronics Engineer - RF",
-      "company": "Hydrix Pty",
-      "location": "Melbourne, Melbourne Region",
-      "salary": "~$120–150k",
+      "title": "Mission Systems Engineer",
+      "company": "Leidos",
+      "location": "Scoresby, Knox Area",
+      "salary": "~$110–130k",
       "salaryEstimated": true,
       "experience": null,
-      "url": "https://www.adzuna.com.au/details/5810210379?utm_medium=api&utm_source=1bc3321f",
-      "score": 66,
-      "reason": "RF electronics design role, strong technical fit though title/tone suggests a more senior scope than 3-5 years.",
+      "url": "https://www.adzuna.com.au/land/ad/5839331224?se=Vgl2gFaX8RGKPN7TmB_3Cw&utm_medium=api&utm_source=1bc3321f&v=5E7DF53F010CA8DA6ADBD1C524E2C4EE32BC57E5",
+      "score": 68,
+      "reason": "Defence mission systems engineering role at Leidos, relevant via defence/mission systems connection",
       "source": "Adzuna",
-      "posted": "2026-07-22T11:32:32Z"
+      "posted": "2026-08-13T13:02:31Z"
     }
   ]
 }
