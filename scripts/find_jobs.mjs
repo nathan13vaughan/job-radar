@@ -380,19 +380,22 @@ function buildRankingInput(candidates) {
   };
 
   const instruction =
-    `Select the best matches (at most ${TOP_N}), scored 0-100 for fit with a one-line ` +
-    "reason each. Prioritise radio/RF/telecommunications relevance, then salary fit, " +
-    "then experience fit. Systems engineering roles are relevant when connected to " +
-    "radio, RF, communications, defence, or mission systems — exclude pure IT " +
-    "infrastructure 'systems engineer' roles (Windows/cloud/sysadmin). The experience " +
-    `band is strict: the candidate has ${prefs.experienceYears} years, so exclude ` +
-    "roles that state a requirement above that band (e.g. 7+ years), roles pitched at " +
-    "principal/leadership level, and junior/graduate roles. A plain 'Senior' title is " +
-    "acceptable only if the ad suggests it suits someone with ~5 years. Omit jobs that " +
-    "are clearly irrelevant or clearly below the salary floor. For every selected job " +
-    'also provide salaryEstimate: the stated salary if the ad gives one, otherwise a ' +
-    'realistic annual AUD range for this role at this level in Melbourne, formatted ' +
-    'exactly like "$120–140k".';
+    `Rank the matches best-first, scored 0-100 for fit with a one-line reason each ` +
+    `(at most ${TOP_N}). Aim to return at least 6 jobs whenever 6+ plausible ` +
+    "candidates exist: include weaker-but-plausible matches with proportionally " +
+    "lower scores rather than omitting them. Only omit a job when it is outright " +
+    "wrong: a different engineering discipline, a stated experience requirement " +
+    "outside the band, principal/leadership or junior/graduate level, or clearly " +
+    "below the salary floor. Prioritise radio/RF/telecommunications relevance, then " +
+    "salary fit, then experience fit. Systems engineering roles are relevant when " +
+    "connected to radio, RF, communications, defence, or mission systems — exclude " +
+    "pure IT infrastructure 'systems engineer' roles (Windows/cloud/sysadmin). The " +
+    `experience band is strict: the candidate has ${prefs.experienceYears} years, so ` +
+    "exclude roles stating a requirement above that band (e.g. 7+ years). A plain " +
+    "'Senior' title is acceptable only if the ad suggests it suits someone with ~5 " +
+    "years. For every selected job also provide salaryEstimate: the stated salary if " +
+    "the ad gives one, otherwise a realistic annual AUD range for this role at this " +
+    'level in Melbourne, formatted exactly like "$120–140k".';
 
   return { jobList, profile, instruction };
 }
@@ -584,8 +587,8 @@ const strictPass = (j) =>
     : j.title.toLowerCase().includes("engineer") && j.descHits >= 3 && j.score >= 25;
 const loosePass = (j) =>
   titleHasDomainKeyword(j.title)
-    ? j.score >= 8
-    : j.title.toLowerCase().includes("engineer") && j.descHits >= 1 && j.score >= 15;
+    ? j.score >= 5
+    : j.title.toLowerCase().includes("engineer") && j.descHits >= 1 && j.score >= 12;
 
 candidates = candidates
   .filter(claudeEnabled ? loosePass : strictPass)
