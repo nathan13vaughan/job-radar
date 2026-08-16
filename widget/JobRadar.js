@@ -21,20 +21,21 @@ const API_URL = `https://api.github.com/repos/${GITHUB_USER}/${REPO}/contents/da
 // Theme
 // ---------------------------------------------------------------------------
 
-const ACCENT = Color.dynamic(new Color("#2563eb"), new Color("#60a5fa"));
+// Warm "sunrise radar" theme — orange accents on warm neutrals.
+const ACCENT = Color.dynamic(new Color("#ea580c"), new Color("#fb923c"));
 const SALARY = Color.dynamic(new Color("#15803d"), new Color("#4ade80"));
 const SALARY_BG = Color.dynamic(new Color("#16a34a", 0.14), new Color("#4ade80", 0.16));
-const EST = Color.dynamic(new Color("#b45309"), new Color("#fbbf24"));
-const EST_BG = Color.dynamic(new Color("#d97706", 0.13), new Color("#fbbf24", 0.15));
-const PRIMARY = Color.dynamic(new Color("#0f172a"), new Color("#f8fafc"));
-const SECONDARY = Color.dynamic(new Color("#64748b"), new Color("#94a3b8"));
-const BG_TOP = Color.dynamic(new Color("#ffffff"), new Color("#1c2030"));
-const BG_BOTTOM = Color.dynamic(new Color("#e8edf5"), new Color("#0f1118"));
+const EST = Color.dynamic(new Color("#c2410c"), new Color("#fdba74"));
+const EST_BG = Color.dynamic(new Color("#ea580c", 0.12), new Color("#fb923c", 0.16));
+const PRIMARY = Color.dynamic(new Color("#1c1917"), new Color("#fafaf9"));
+const SECONDARY = Color.dynamic(new Color("#78716c"), new Color("#a8a29e"));
+const BG_TOP = Color.dynamic(new Color("#fffbf7"), new Color("#231610"));
+const BG_BOTTOM = Color.dynamic(new Color("#ffe8d1"), new Color("#120c08"));
 
 function badgeColor(score) {
-  if (score >= 80) return new Color("#16a34a");
-  if (score >= 60) return new Color("#d97706");
-  return new Color("#64748b");
+  if (score >= 80) return new Color("#ea580c");
+  if (score >= 60) return new Color("#b45309");
+  return new Color("#78716c");
 }
 
 // ---------------------------------------------------------------------------
@@ -122,16 +123,34 @@ function addHeader(widget, data, family) {
   title.font = Font.heavySystemFont(small ? 10 : 11);
   title.textColor = ACCENT;
 
+  if (!small && data.jobs.length > 0) {
+    header.addSpacer(5);
+    const countChip = header.addStack();
+    countChip.backgroundColor = ACCENT;
+    countChip.cornerRadius = 6;
+    countChip.setPadding(1, 5, 1, 5);
+    const countText = countChip.addText(String(data.jobs.length));
+    countText.font = Font.boldSystemFont(9);
+    countText.textColor = Color.white();
+  }
+
   header.addSpacer();
   const stamp = header.addText(updatedLabel(data.updated));
   stamp.font = Font.mediumSystemFont(8);
   stamp.textColor = SECONDARY;
 }
 
-function addJobRow(widget, job, opts) {
+function addJobRow(widget, job, opts, rank) {
   const row = widget.addStack();
   row.centerAlignContent();
   if (job.url) row.url = job.url;
+
+  if (rank != null) {
+    const num = row.addText(String(rank));
+    num.font = Font.heavySystemFont(opts.titleSize + 1);
+    num.textColor = ACCENT;
+    row.addSpacer(7);
+  }
 
   const left = row.addStack();
   left.layoutVertically();
@@ -234,7 +253,7 @@ function buildWidget(data) {
 
   const jobs = data.jobs.slice(0, opts.rows);
   for (let i = 0; i < jobs.length; i++) {
-    addJobRow(widget, jobs[i], opts);
+    addJobRow(widget, jobs[i], opts, family === "small" ? null : i + 1);
     if (i < jobs.length - 1) widget.addSpacer(opts.gap);
   }
   if (family === "small" && jobs[0]?.url) widget.url = jobs[0].url;
@@ -296,12 +315,13 @@ function presentTable(data) {
     table.addRow(msgRow);
   }
 
-  for (const job of data.jobs) {
+  for (let i = 0; i < data.jobs.length; i++) {
+    const job = data.jobs[i];
     const row = new UITableRow();
     row.height = job.reason ? 84 : 64;
     const subParts = [job.salary, job.experience, job.company, shortLocation(job.location), ageLabel(job.posted)].filter(Boolean);
     const sub = job.reason ? `${subParts.join("  ·  ")}\n${job.reason}` : subParts.join("  ·  ");
-    const cell = row.addText(job.title, sub);
+    const cell = row.addText(`${i + 1}.  ${job.title}`, sub);
     cell.titleFont = Font.semiboldSystemFont(15);
     cell.subtitleFont = Font.systemFont(12);
     cell.subtitleColor = Color.gray();
