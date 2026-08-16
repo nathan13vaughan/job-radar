@@ -15,7 +15,7 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const prefs = JSON.parse(readFileSync(join(root, "preferences.json"), "utf8"));
 
-const MAX_CANDIDATES_FOR_RANKING = 25;
+const MAX_CANDIDATES_FOR_RANKING = 30;
 const TOP_N = 10;
 
 // ---------------------------------------------------------------------------
@@ -200,9 +200,11 @@ async function fetchAdzuna() {
   let successes = 0;
   let failures = 0;
 
-  // Targeted searches for each preferred role title.
+  // Targeted searches for each preferred role title (Adzuna relevance order —
+  // date order buries the best-matching titles under newer unrelated ones).
   for (const role of prefs.roles) {
     const params = new URLSearchParams({ ...baseParams, results_per_page: "30", what: role });
+    params.delete("sort_by");
     try {
       const n = collect(await fetchJson(`https://api.adzuna.com/v1/api/jobs/${prefs.location.country}/search/1?${params}`));
       console.log(`Adzuna: "${role}" -> ${n} results`);
@@ -389,7 +391,11 @@ function buildRankingInput(candidates) {
     "below the salary floor. Prioritise radio/RF/telecommunications relevance, then " +
     "salary fit, then experience fit. Systems engineering roles are relevant when " +
     "connected to radio, RF, communications, defence, or mission systems — exclude " +
-    "pure IT infrastructure 'systems engineer' roles (Windows/cloud/sysadmin). The " +
+    "pure IT infrastructure 'systems engineer' roles (Windows/cloud/sysadmin). " +
+    "Adjacent disciplines an RF/telecom engineer could credibly move into — " +
+    "electronics/hardware engineering, broadcast engineering, field/service " +
+    "engineering on radio or comms networks — are acceptable to fill remaining " +
+    "slots at moderate scores (40-60). The " +
     `experience band is strict: the candidate has ${prefs.experienceYears} years, so ` +
     "exclude roles stating a requirement above that band (e.g. 7+ years). A plain " +
     "'Senior' title is acceptable only if the ad suggests it suits someone with ~5 " +
@@ -587,8 +593,8 @@ const strictPass = (j) =>
     : j.title.toLowerCase().includes("engineer") && j.descHits >= 3 && j.score >= 25;
 const loosePass = (j) =>
   titleHasDomainKeyword(j.title)
-    ? j.score >= 5
-    : j.title.toLowerCase().includes("engineer") && j.descHits >= 1 && j.score >= 12;
+    ? j.score >= 0
+    : j.title.toLowerCase().includes("engineer") && (j.descHits >= 1 || j.score >= 12);
 
 candidates = candidates
   .filter(claudeEnabled ? loosePass : strictPass)
