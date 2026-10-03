@@ -1,10 +1,23 @@
 {
-  "updated": "2026-10-02T23:29:49.726Z",
+  "updated": "2026-10-03T22:36:14.607Z",
   "setupNeeded": false,
   "message": null,
   "rankedBy": "claude-subscription",
   "criteria": "3-5 yrs · $110k+ · Melbourne",
   "jobs": [
+    {
+      "title": "RF (Radio Frequency) Engineer",
+      "company": "BAE Systems",
+      "location": "South Yarra, Stonnington Area",
+      "salary": "~$120–150k",
+      "salaryEstimated": true,
+      "experience": null,
+      "url": "https://www.adzuna.com.au/details/5903276179?utm_medium=api&utm_source=1bc3321f",
+      "score": 88,
+      "reason": "RF Engineer at BAE Systems in Melbourne, a defence RF role with hybrid work and no experience requirement above the band.",
+      "source": "Adzuna",
+      "posted": "2026-09-30T11:42:52Z"
+    },
     {
       "title": "RF Engineer - Wireless",
       "company": "Downer Group",
@@ -13,8 +26,8 @@
       "salaryEstimated": true,
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5901203744?utm_medium=api&utm_source=1bc3321f",
-      "score": 88,
-      "reason": "RF Engineer on 4G/5G site design with EME/ACMA compliance, directly matching target role in Melbourne.",
+      "score": 86,
+      "reason": "RF Engineer for 4G/5G site design with EME and ACMA compliance, a direct match for target role and mid-level.",
       "source": "Adzuna",
       "posted": "2026-09-28T14:31:06Z"
     },
@@ -26,23 +39,10 @@
       "salaryEstimated": true,
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5902877714?utm_medium=api&utm_source=1bc3321f",
-      "score": 87,
-      "reason": "Same Downer RF Engineer wireless role (4G/5G RF site design), strong radio/telecom fit.",
+      "score": 85,
+      "reason": "Same Downer RF Engineer wireless role (4G/5G RF site design) based in Melbourne, strong telecom fit.",
       "source": "Adzuna",
       "posted": "2026-09-30T00:58:05Z"
-    },
-    {
-      "title": "RF (Radio Frequency) Engineer",
-      "company": "BAE Systems",
-      "location": "South Yarra, Stonnington Area",
-      "salary": "~$120–145k",
-      "salaryEstimated": true,
-      "experience": null,
-      "url": "https://www.adzuna.com.au/details/5903276179?utm_medium=api&utm_source=1bc3321f",
-      "score": 85,
-      "reason": "RF Engineer at BAE Systems in defence, hybrid in Melbourne, strong RF relevance.",
-      "source": "Adzuna",
-      "posted": "2026-09-30T11:42:52Z"
     },
     {
       "title": "Operations Engineer - RF Specialist",
@@ -53,7 +53,7 @@
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5887141998?utm_medium=api&utm_source=1bc3321f",
       "score": 78,
-      "reason": "Operations Engineer RF Specialist at Motorola Solutions, radio/communications network focus.",
+      "reason": "Operations Engineer RF Specialist at Motorola Solutions, radio and comms networks, suits mid-level.",
       "source": "Adzuna",
       "posted": "2026-09-17T14:16:52Z"
     },
@@ -61,12 +61,12 @@
       "title": "Systems Engineer",
       "company": "Saab",
       "location": "Melbourne, Melbourne Region",
-      "salary": "~$115–140k",
+      "salary": "~$115–145k",
       "salaryEstimated": true,
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5900317435?utm_medium=api&utm_source=1bc3321f",
-      "score": 68,
-      "reason": "Defence systems engineer at Saab (communications/mission systems), mid-level fit.",
+      "score": 66,
+      "reason": "Defence systems engineering at Saab, connected to mission and comms systems, mid-level plausible.",
       "source": "Adzuna",
       "posted": "2026-09-27T14:53:47Z"
     },
@@ -74,12 +74,12 @@
       "title": "Systems Engineer",
       "company": "BAE Systems",
       "location": "South Yarra, Stonnington Area",
-      "salary": "~$115–140k",
+      "salary": "~$115–145k",
       "salaryEstimated": true,
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5882053841?utm_medium=api&utm_source=1bc3321f",
-      "score": 62,
-      "reason": "BAE Systems defence systems engineer, can be Melbourne-based, mission-systems relevance.",
+      "score": 60,
+      "reason": "Defence Systems Engineer at BAE Systems, mission systems relevance, can be Melbourne based.",
       "source": "Adzuna",
       "posted": "2026-09-13T10:55:01Z"
     },
@@ -92,7 +92,7 @@
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5894177936?utm_medium=api&utm_source=1bc3321f",
       "score": 58,
-      "reason": "Telecommunications Engineer (voice and data) at a telco provider; relevant but less RF-focused and salary unstated.",
+      "reason": "Telecommunications Engineer for voice and data at a telco provider, relevant discipline but salary not stated and likely nearer the floor.",
       "source": "Adzuna",
       "posted": "2026-09-23T03:00:53Z"
     },
@@ -100,14 +100,27 @@
       "title": "Operations Engineer",
       "company": "Motorola Solutions",
       "location": "Melbourne, Melbourne Region",
-      "salary": "~$105–125k",
+      "salary": "~$100–125k",
       "salaryEstimated": true,
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5908228715?utm_medium=api&utm_source=1bc3321f",
-      "score": 50,
-      "reason": "Motorola Solutions Operations Engineer, adjacent field/service engineering on communications networks.",
+      "score": 52,
+      "reason": "Operations Engineer at Motorola Solutions, likely radio and critical communications operations, adjacent field/service role.",
       "source": "Adzuna",
       "posted": "2026-10-03T01:00:53Z"
+    },
+    {
+      "title": "Associate Systems Engineer",
+      "company": "Saab",
+      "location": "Melbourne, Melbourne Region",
+      "salary": "~$90–110k",
+      "salaryEstimated": true,
+      "experience": null,
+      "url": "https://www.adzuna.com.au/details/5900303486?utm_medium=api&utm_source=1bc3321f",
+      "score": 45,
+      "reason": "Associate-level defence systems engineering at Saab, a lower level and salary but relevant domain.",
+      "source": "Adzuna",
+      "posted": "2026-09-27T14:42:33Z"
     }
   ]
 }
