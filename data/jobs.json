@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-25T03:17:23.099Z",
+  "updated": "2026-11-26T02:35:36.873Z",
   "setupNeeded": false,
   "message": null,
   "rankedBy": "claude-subscription",
@@ -9,14 +9,27 @@
       "title": "RF Engineer",
       "company": "Downer",
       "location": "Melbourne, Melbourne Region",
-      "salary": "~$110–140k",
+      "salary": "~$115–140k",
       "salaryEstimated": true,
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5945454242?utm_medium=api&utm_source=1bc3321f",
       "score": 92,
-      "reason": "Direct RF Engineer role on indoor wireless (IBC/DAS, 4G/5G) design at Downer, in Melbourne.",
+      "reason": "Directly RF-focused: IBC/DAS and BTS design for 4G/5G in Melbourne, core RF discipline.",
       "source": "Adzuna",
       "posted": "2026-10-29T19:26:29Z"
+    },
+    {
+      "title": "4g/5g Network Support Engineer",
+      "company": "Vocus",
+      "location": "Mitcham North, Whitehorse Area",
+      "salary": "~$100–125k",
+      "salaryEstimated": true,
+      "experience": null,
+      "url": "https://www.adzuna.com.au/details/5978631502?utm_medium=api&utm_source=1bc3321f",
+      "score": 85,
+      "reason": "4G/5G private wireless radio network support in Melbourne, strong telecom/radio match, though Tier 1/2 support level.",
+      "source": "Adzuna",
+      "posted": "2026-11-26T03:46:41Z"
     },
     {
       "title": "Senior Telecommunications Engineer",
@@ -26,23 +39,10 @@
       "salaryEstimated": true,
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5969164453?utm_medium=api&utm_source=1bc3321f",
-      "score": 72,
-      "reason": "Telecommunications engineering at WSP in Melbourne. Titled Senior, but likely suits about 5 years of experience.",
+      "score": 70,
+      "reason": "Telecommunications engineering at WSP in Melbourne; 'Senior' title but no stated years, plausible for ~5 years.",
       "source": "Adzuna",
       "posted": "2026-11-18T02:27:11Z"
-    },
-    {
-      "title": "Senior Systems Engineer (C4i)",
-      "company": "KBR, Inc.",
-      "location": "Melbourne, Melbourne Region",
-      "salary": "~$130–160k",
-      "salaryEstimated": true,
-      "experience": null,
-      "url": "https://www.adzuna.com.au/details/5969166512?utm_medium=api&utm_source=1bc3321f",
-      "score": 64,
-      "reason": "C4i systems engineering in defence, which fits comms and mission systems. Senior title, so the experience fit is uncertain.",
-      "source": "Adzuna",
-      "posted": "2026-11-18T02:28:24Z"
     },
     {
       "title": "Defence Systems Engineers",
@@ -51,22 +51,48 @@
       "salary": "~$120–150k",
       "salaryEstimated": true,
       "experience": null,
-      "url": "https://www.adzuna.com.au/details/5964159135?utm_medium=api&utm_source=1bc3321f",
-      "score": 62,
-      "reason": "Defence systems engineering at a C4i and comms-focused company, relevant to mission systems.",
+      "url": "https://www.adzuna.com.au/details/5963140972?utm_medium=api&utm_source=1bc3321f",
+      "score": 66,
+      "reason": "Defence systems engineering with C4i (comms/ICT/mission systems), relevant to communications and defence.",
       "source": "Adzuna",
-      "posted": "2026-11-13T17:22:22Z"
+      "posted": "2026-11-13T00:13:22Z"
+    },
+    {
+      "title": "Telecommunications Project Engineer | Rail LTE | Perth",
+      "company": "HRG RECRUITMENT",
+      "location": "Melbourne, Melbourne Region",
+      "salary": "~$120–150k",
+      "salaryEstimated": true,
+      "experience": null,
+      "url": "https://www.adzuna.com.au/details/5954386044?utm_medium=api&utm_source=1bc3321f",
+      "score": 62,
+      "reason": "Rail LTE telecom project engineer role suited to radio network engineers, but it's a Perth contract with regular site visits, so location is a concern.",
+      "source": "Adzuna",
+      "posted": "2026-11-06T02:09:54Z"
+    },
+    {
+      "title": "Systems Engineer",
+      "company": "BAE Systems",
+      "location": "Melbourne, Melbourne Region",
+      "salary": "~$115–145k",
+      "salaryEstimated": true,
+      "experience": null,
+      "url": "https://www.adzuna.com.au/details/5975691526?utm_medium=api&utm_source=1bc3321f",
+      "score": 55,
+      "reason": "BAE Systems defence systems engineer, can be Melbourne-based; connection to comms/mission systems is plausible.",
+      "source": "Adzuna",
+      "posted": "2026-11-23T13:56:30Z"
     },
     {
       "title": "Systems Engineer",
       "company": "EOS Defence Systems Pty",
       "location": "Hume Area, Melbourne Region",
-      "salary": "~$110–140k",
+      "salary": "~$115–140k",
       "salaryEstimated": true,
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5971867551?utm_medium=api&utm_source=1bc3321f",
       "score": 50,
-      "reason": "Defence systems engineering that integrates multidisciplinary electronics. It is less tied to radio.",
+      "reason": "Defence systems engineering with multidisciplinary integration (electronics), moderate relevance.",
       "source": "Adzuna",
       "posted": "2026-11-20T03:54:22Z"
     },
@@ -79,9 +105,22 @@
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5969162351?utm_medium=api&utm_source=1bc3321f",
       "score": 45,
-      "reason": "Defence deep-tech role (laser systems) in Melbourne. It is an adjacent electronics and controls discipline, and the salary is stated at $110–135k.",
+      "reason": "Defence laser systems control engineering at a Melbourne startup; electronics-adjacent, salary meets the floor.",
       "source": "Adzuna",
       "posted": "2026-11-18T02:25:54Z"
+    },
+    {
+      "title": "Avionics Systems Engineer - GPS/GNSS",
+      "company": "Cyient",
+      "location": "Melbourne, Melbourne Region",
+      "salary": "~$120–145k",
+      "salaryEstimated": true,
+      "experience": "5 yrs",
+      "url": "https://www.adzuna.com.au/details/5965489147?utm_medium=api&utm_source=1bc3321f",
+      "score": 42,
+      "reason": "GNSS/avionics navigation systems engineer; RF-adjacent and the 5 years stated fits the band's upper edge.",
+      "source": "Adzuna",
+      "posted": "2026-11-14T18:37:55Z"
     }
   ]
 }
