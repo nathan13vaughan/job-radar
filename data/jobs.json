@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-26T02:35:36.873Z",
+  "updated": "2026-11-27T02:35:29.865Z",
   "setupNeeded": false,
   "message": null,
   "rankedBy": "claude-subscription",
@@ -13,8 +13,8 @@
       "salaryEstimated": true,
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5945454242?utm_medium=api&utm_source=1bc3321f",
-      "score": 92,
-      "reason": "Directly RF-focused: IBC/DAS and BTS design for 4G/5G in Melbourne, core RF discipline.",
+      "score": 90,
+      "reason": "RF Engineer on indoor wireless (IBC/DAS, 4G/5G) design in Melbourne; direct RF match.",
       "source": "Adzuna",
       "posted": "2026-10-29T19:26:29Z"
     },
@@ -26,23 +26,23 @@
       "salaryEstimated": true,
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5978631502?utm_medium=api&utm_source=1bc3321f",
-      "score": 85,
-      "reason": "4G/5G private wireless radio network support in Melbourne, strong telecom/radio match, though Tier 1/2 support level.",
+      "score": 82,
+      "reason": "4G/5G private wireless radio network support; strong telecom/radio fit, though Tier I/II support may pay near the floor.",
       "source": "Adzuna",
       "posted": "2026-11-26T03:46:41Z"
     },
     {
-      "title": "Senior Telecommunications Engineer",
-      "company": "WSP",
+      "title": "Senior Systems Engineer (C4i)",
+      "company": "KBR, Inc.",
       "location": "Melbourne, Melbourne Region",
-      "salary": "~$125–150k",
+      "salary": "~$140–170k",
       "salaryEstimated": true,
       "experience": null,
-      "url": "https://www.adzuna.com.au/details/5969164453?utm_medium=api&utm_source=1bc3321f",
-      "score": 70,
-      "reason": "Telecommunications engineering at WSP in Melbourne; 'Senior' title but no stated years, plausible for ~5 years.",
+      "url": "https://www.adzuna.com.au/details/5969166512?utm_medium=api&utm_source=1bc3321f",
+      "score": 72,
+      "reason": "Senior Systems Engineer on C4i defence communications; relevant to comms and mission systems, but seniority is uncertain.",
       "source": "Adzuna",
-      "posted": "2026-11-18T02:27:11Z"
+      "posted": "2026-11-18T02:28:24Z"
     },
     {
       "title": "Defence Systems Engineers",
@@ -52,23 +52,23 @@
       "salaryEstimated": true,
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5963140972?utm_medium=api&utm_source=1bc3321f",
-      "score": 66,
-      "reason": "Defence systems engineering with C4i (comms/ICT/mission systems), relevant to communications and defence.",
+      "score": 68,
+      "reason": "Defence systems engineering in a C4i/ICT/comms environment; connected to mission systems.",
       "source": "Adzuna",
       "posted": "2026-11-13T00:13:22Z"
     },
     {
-      "title": "Telecommunications Project Engineer | Rail LTE | Perth",
-      "company": "HRG RECRUITMENT",
+      "title": "Senior Telecommunications Engineer",
+      "company": "WSP",
       "location": "Melbourne, Melbourne Region",
-      "salary": "~$120–150k",
+      "salary": "~$130–160k",
       "salaryEstimated": true,
       "experience": null,
-      "url": "https://www.adzuna.com.au/details/5954386044?utm_medium=api&utm_source=1bc3321f",
+      "url": "https://www.adzuna.com.au/details/5969164453?utm_medium=api&utm_source=1bc3321f",
       "score": 62,
-      "reason": "Rail LTE telecom project engineer role suited to radio network engineers, but it's a Perth contract with regular site visits, so location is a concern.",
+      "reason": "Senior Telecommunications Engineer at WSP; strong discipline match, but the senior level may exceed the band.",
       "source": "Adzuna",
-      "posted": "2026-11-06T02:09:54Z"
+      "posted": "2026-11-18T02:27:11Z"
     },
     {
       "title": "Systems Engineer",
@@ -78,8 +78,8 @@
       "salaryEstimated": true,
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5975691526?utm_medium=api&utm_source=1bc3321f",
-      "score": 55,
-      "reason": "BAE Systems defence systems engineer, can be Melbourne-based; connection to comms/mission systems is plausible.",
+      "score": 58,
+      "reason": "Defence systems engineer at BAE Systems, with a Melbourne option; mission-systems relevance, but the domain is unclear.",
       "source": "Adzuna",
       "posted": "2026-11-23T13:56:30Z"
     },
@@ -87,12 +87,12 @@
       "title": "Systems Engineer",
       "company": "EOS Defence Systems Pty",
       "location": "Hume Area, Melbourne Region",
-      "salary": "~$115–140k",
+      "salary": "~$110–135k",
       "salaryEstimated": true,
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5971867551?utm_medium=api&utm_source=1bc3321f",
       "score": 50,
-      "reason": "Defence systems engineering with multidisciplinary integration (electronics), moderate relevance.",
+      "reason": "Defence systems engineering with multidisciplinary integration; moderate relevance with no radio focus stated.",
       "source": "Adzuna",
       "posted": "2026-11-20T03:54:22Z"
     },
@@ -105,22 +105,22 @@
       "experience": null,
       "url": "https://www.adzuna.com.au/details/5969162351?utm_medium=api&utm_source=1bc3321f",
       "score": 45,
-      "reason": "Defence laser systems control engineering at a Melbourne startup; electronics-adjacent, salary meets the floor.",
+      "reason": "Defence laser systems control engineer; adjacent electronics/hardware discipline in defence, at the salary floor.",
       "source": "Adzuna",
       "posted": "2026-11-18T02:25:54Z"
     },
     {
-      "title": "Avionics Systems Engineer - GPS/GNSS",
-      "company": "Cyient",
+      "title": "Telecommunications Project Engineer | Rail LTE | Perth",
+      "company": "HRG RECRUITMENT",
       "location": "Melbourne, Melbourne Region",
-      "salary": "~$120–145k",
+      "salary": "~$120–150k",
       "salaryEstimated": true,
-      "experience": "5 yrs",
-      "url": "https://www.adzuna.com.au/details/5965489147?utm_medium=api&utm_source=1bc3321f",
+      "experience": null,
+      "url": "https://www.adzuna.com.au/details/5954386044?utm_medium=api&utm_source=1bc3321f",
       "score": 42,
-      "reason": "GNSS/avionics navigation systems engineer; RF-adjacent and the 5 years stated fits the band's upper edge.",
+      "reason": "Rail LTE telecom project engineer role. It is a Perth contract, so the location is poor for a Melbourne candidate, but it is on-topic.",
       "source": "Adzuna",
-      "posted": "2026-11-14T18:37:55Z"
+      "posted": "2026-11-06T02:09:54Z"
     }
   ]
 }
